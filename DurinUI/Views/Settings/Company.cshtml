@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Settings";
+}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <h3>Company Settings</h3>
+                <form class="form" action="/Settings/SetCompany" method="POST" autocomplete="off" enctype="multipart/form-data">
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Offical Name</label>
+                            <input class="form-control" placeholder="Offical Name" name="officalName" type="text" value="@DAL.AppConfig.settings.company.officalName">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Website</label>
+                            <input class="form-control" placeholder="Website" name="website" type="text" value="@DAL.AppConfig.settings.company.website">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Address 1</label>
+                            <input class="form-control" placeholder="Address 1" name="address1" type="text" value="@DAL.AppConfig.settings.company.address1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Address 2</label>
+                            <input class="form-control" placeholder="Address 2" name="address2" type="text" value="@DAL.AppConfig.settings.company.address2">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Phone Number</label>
+                            <input class="form-control" placeholder="Phone Number" name="phoneNumber" type="text" value="@DAL.AppConfig.settings.company.phoneNumber">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">E-Mail</label>
+                            <input class="form-control" placeholder="E-Mail" name="email" type="text" value="@DAL.AppConfig.settings.company.email">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">City</label>
+                            <input class="form-control" placeholder="City" name="city" type="text" value="@DAL.AppConfig.settings.company.city">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">State</label>
+                            <input class="form-control" placeholder="State" name="state" type="text" value="@DAL.AppConfig.settings.company.state">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Country</label>
+                            <input class="form-control" placeholder="Country" name="country" type="text" value="@DAL.AppConfig.settings.company.country">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Zip Code</label>
+                            <input class="form-control" placeholder="Zip Code" name="zipcode" type="text" value="@DAL.AppConfig.settings.company.zipcode">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Logo</label>
+                            <input class="form-control" accept="image/png, image/jpeg" name="logo" type="file">
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,308 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<!--begin::Head-->
+<head>
+	<base href="../../../" />
+	<title>DurinLS Reset Pass</title>
+	<meta charset="utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta property="og:locale" content="en_US" />
+	<link rel="shortcut icon" href="/metronic/assets/media/logos/favicon.ico" />
+	<!--begin::Fonts(mandatory for all pages)-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+	<!--end::Fonts-->
+	<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+	<link href="/metronic/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+	<link href="/metronic/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	<!--end::Global Stylesheets Bundle-->
+	<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
+</head>
+<!--end::Head-->
+<!--begin::Body-->
+<body id="kt_body" class="app-blank bgi-size-cover bgi-attachment-fixed bgi-position-center">
+	<!--begin::Theme mode setup on page load-->
+	<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if ( localStorage.getItem("data-bs-theme") !== null ) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }</script>
+	<!--end::Theme mode setup on page load-->
+	<!--begin::Root-->
+	<div class="d-flex flex-column flex-root" id="kt_app_root">
+		<!--begin::Page bg image-->
+		<style>body { background-image: url('/metronic/assets/media/auth/bg10.jpeg'); } [data-bs-theme="dark"] body { background-image: url('/metronic/assets/media/auth/bg10-dark.jpeg'); }</style>
+		<!--end::Page bg image-->
+		<!--begin::Authentication - New password -->
+		<div class="d-flex flex-column flex-lg-row flex-column-fluid">
+			<!--begin::Aside-->
+			<div class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100">
+				<!--begin::Image-->
+				<img class="theme-light-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20" src="/media/logo_trans.png" alt="" />
+				<img class="theme-dark-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20" src="/media/logo_trans.png" alt="" />
+				<!--end::Image-->
+				<!--begin::Title-->
+				<h1 class="text-gray-800 fs-2qx fw-bold text-center mb-7">The leader in early disease detection</h1>
+				<!--end::Title-->
+				<!--begin::Text-->
+				<div class="text-gray-600 fs-base text-center fw-semibold">
+					Start your journey to a diagnosis with Duritect &#8482;
+				</div>
+				<!--end::Text-->
+			</div>
+			<!--begin::Aside-->
+			<!--begin::Body-->
+			<div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12">
+				<!--begin::Wrapper-->
+				<div class="bg-body d-flex flex-column flex-center rounded-4 w-md-600px p-10">
+					<!--begin::Content-->
+					<div class="d-flex flex-center flex-column align-items-stretch h-lg-100 w-md-400px">
+						<!--begin::Wrapper-->
+						<div class="d-flex flex-center flex-column flex-column-fluid pb-15 pb-lg-20">
+							<!--begin::Form-->
+							<form class="form w-100" novalidate="novalidate" id="kt_new_password_form" data-kt-redirect-url="/Login/Index" action="#">
+								<!--begin::Heading-->
+								<div class="text-center mb-10">
+									<!--begin::Title-->
+									<h1 class="text-gray-900 fw-bolder mb-3">Setup New Password</h1>
+									<!--end::Title-->
+									<!--begin::Link-->
+									<div class="text-gray-500 fw-semibold fs-6">
+										Have you already reset the password ?
+										<a href="/Login/Index" class="link-primary fw-bold">Sign in</a>
+									</div>
+									<!--end::Link-->
+								</div>
+								<!--begin::Heading-->
+								<!--begin::Input group-->
+								<div class="fv-row mb-8" data-kt-password-meter="true">
+									<!--begin::Wrapper-->
+									<div class="mb-1">
+										<!--begin::Input wrapper-->
+										<div class="position-relative mb-3">
+											<input class="form-control bg-transparent" type="password" placeholder="Password" name="password" autocomplete="off" />
+											<span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-meter-control="visibility">
+												<i class="ki-duotone ki-eye-slash fs-2"></i>
+												<i class="ki-duotone ki-eye fs-2 d-none"></i>
+											</span>
+										</div>
+										<!--end::Input wrapper-->
+										<!--begin::Meter-->
+										<div class="d-flex align-items-center mb-3" data-kt-password-meter-control="highlight">
+											<div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+											<div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+											<div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+											<div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px"></div>
+										</div>
+										<!--end::Meter-->
+									</div>
+									<!--end::Wrapper-->
+									<!--begin::Hint-->
+									<div class="text-muted">Use 8 or more characters with a mix of letters, numbers & symbols.</div>
+									<!--end::Hint-->
+								</div>
+								<!--end::Input group=-->
+								<!--end::Input group=-->
+								<div class="fv-row mb-8">
+									<!--begin::Repeat Password-->
+									<input type="password" placeholder="Repeat Password" name="confirm-password" autocomplete="off" class="form-control bg-transparent" />
+									<!--end::Repeat Password-->
+								</div>
+								<!--end::Input group=-->
+								<!--begin::Action-->
+								<div class="d-grid mb-10">
+									<button type="button" id="kt_new_password_submit" class="btn btn-primary">
+										<!--begin::Indicator label-->
+										<span class="indicator-label">Submit</span>
+										<!--end::Indicator label-->
+										<!--begin::Indicator progress-->
+										<span class="indicator-progress">
+											Please wait...
+											<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+										</span>
+										<!--end::Indicator progress-->
+									</button>
+								</div>
+								<!--end::Action-->
+							</form>
+							<!--end::Form-->
+						</div>
+						<!--end::Wrapper-->
+					</div>
+					<!--end::Content-->
+				</div>
+				<!--end::Wrapper-->
+			</div>
+			<!--end::Body-->
+		</div>
+		<!--end::Authentication - New password-->
+	</div>
+	<!--end::Root-->
+	<!--begin::Javascript-->
+	<script>var hostUrl = "/metronic/assets/";</script>
+	<!--begin::Global Javascript Bundle(mandatory for all pages)-->
+	<script src="/metronic/assets/plugins/global/plugins.bundle.js"></script>
+	<script src="/metronic/assets/js/scripts.bundle.js"></script>
+	<script type="text/javascript" src="/sotec.js"></script>
+	<!--end::Global Javascript Bundle-->
+	<!--begin::Custom Javascript(used for this page only)-->
+	<script>
+		"use strict";
+
+		// Class Definition
+		var KTAuthNewPassword = function() {
+			// Elements
+			var form;
+			var submitButton;
+			var validator;
+			var passwordMeter;
+
+			var handleForm = function(e) {
+				// Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+				validator = FormValidation.formValidation(
+					form,
+					{
+						fields: {
+							'password': {
+								validators: {
+									notEmpty: {
+										message: 'The password is required'
+									},
+									callback: {
+										message: 'Please enter valid password',
+										callback: function(input) {
+											if (input.value.length > 0) {
+												return validatePassword();
+											}
+										}
+									}
+								}
+							},
+							'confirm-password': {
+								validators: {
+									notEmpty: {
+										message: 'The password confirmation is required'
+									},
+									identical: {
+										compare: function() {
+											return form.querySelector('[name="password"]').value;
+										},
+										message: 'The password and its confirm are not the same'
+									}
+								}
+							}
+						},
+						plugins: {
+							trigger: new FormValidation.plugins.Trigger({
+								event: {
+									password: false
+								}
+							}),
+							bootstrap: new FormValidation.plugins.Bootstrap5({
+								rowSelector: '.fv-row',
+								eleInvalidClass: '',  // comment to enable invalid state icons
+								eleValidClass: '' // comment to enable valid state icons
+							})
+						}
+					}
+				);
+
+				submitButton.addEventListener('click', function (e) {
+					e.preventDefault();
+
+					validator.revalidateField('password');
+
+					validator.validate().then(function(status) {
+						if (status == 'Valid') {
+							submitButton.setAttribute('data-kt-indicator', 'on');
+							submitButton.disabled = true;
+
+							Sotec.GetData(
+								{ url: "/Login/ResetPass", method: "POST", data: { password: form.querySelector('[name="password"]').value, auth: '@ViewBag.auth' } },
+								function (ret) {
+									submitButton.removeAttribute('data-kt-indicator');
+									submitButton.disabled = false;
+
+									// Show message popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+									Swal.fire({
+										text: "Your password reset successfully. You can login with new password.",
+										icon: "success",
+										buttonsStyling: false,
+										confirmButtonText: "Ok, got it!",
+										customClass: {
+											confirmButton: "btn btn-primary"
+										}
+									}).then(function (result) {
+										if (result.isConfirmed) {
+											var redirectUrl = form.getAttribute('data-kt-redirect-url');
+											if (redirectUrl) {
+												location.href = redirectUrl;
+											}
+										}
+									});
+								},
+								function (ret) {
+									submitButton.removeAttribute('data-kt-indicator');
+									submitButton.disabled = false;
+
+									Swal.fire({
+										text: ret.responseText,
+										icon: "error",
+										buttonsStyling: false,
+										confirmButtonColor: "#00adb5",
+										confirmButtonText: "Try Again",
+										customClass: {
+											confirmButton: "btn btn-primary"
+										}
+									});
+								}
+							);
+						} else {
+							// Show error popup. For more info check the plugin's official documentation: https://sweetalert2.github.io/
+							Swal.fire({
+								text: "Sorry, looks like there are some errors detected, please try again.",
+								icon: "error",
+								buttonsStyling: false,
+								confirmButtonText: "Ok, got it!",
+								customClass: {
+									confirmButton: "btn btn-primary"
+								}
+							});
+						}
+					});
+				});
+
+				form.querySelector('input[name="password"]').addEventListener('input', function() {
+					if (this.value.length > 0) {
+						validator.updateFieldStatus('password', 'NotValidated');
+					}
+				});
+			}
+
+			var validatePassword = function() {
+				return  (passwordMeter.getScore() === 100);
+			}
+
+			// Public Functions
+			return {
+				// public functions
+				init: function() {
+					form = document.querySelector('#kt_new_password_form');
+					submitButton = document.querySelector('#kt_new_password_submit');
+					passwordMeter = KTPasswordMeter.getInstance(form.querySelector('[data-kt-password-meter="true"]'));
+
+					handleForm();
+				}
+			};
+		}();
+
+		// On document ready
+		KTUtil.onDOMContentLoaded(function() {
+			KTAuthNewPassword.init();
+		});
+	</script>
+	<!--end::Custom Javascript-->
+	<!--end::Javascript-->
+</body>
+<!--end::Body-->
+</html>

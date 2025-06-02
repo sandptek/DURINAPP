@@ -1,0 +1,426 @@
+﻿@{
+    ViewData["Title"] = "Tasks";
+}
+@section Scripts {
+    <script>
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Tasks', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'Tasks', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Tasks', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                var values = {};
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+                values.deleted = 1;
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Tasks', keys: key, values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+
+                return d.promise();
+            }
+        });
+        var storeUser = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: true,
+                allowDeleting: false,
+                allowAdding: true,
+                useIcons: true,
+                form: {
+                    items: [{
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 2,
+                        items: [
+                            {
+                                itemType: 'group',
+                                caption: "Info",
+                                colCount: 3,
+                                colSpan: 2,
+                                items: ["userid", "status", "priority"],
+                            },
+                            {
+                                itemType: 'group',
+                                caption: "Detail",
+                                colCount: 1,
+                                colSpan: 2,
+                                items: ["title", {
+                                    dataField: 'description',
+                                    editorType: 'dxTextArea',
+                                    colSpan: 2,
+                                    editorOptions: {
+                                        height: 100,
+                                    },
+                                }],
+                            },
+                            {
+                                itemType: 'group',
+                                caption: "Dates",
+                                colCount: 2,
+                                colSpan: 2,
+                                items: ["dueDate", "completedDate"],
+                            }
+                        ],
+                    }],
+                }
+            },
+            columns: [
+                {
+                    dataField: "userid",
+                    caption: "User",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storeUser,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: function(item) {
+                            if (!item) {
+                                return '';
+                            }
+                            return `${item.firstname} ${item.lastname}`;
+                        }
+                    },
+                },
+                {
+                    dataField: "createdDate",
+                    dataType: "datetime",
+                    sortOrder: 'desc',
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    }
+                },
+                {
+                    dataField: "updatedDate",
+                    dataType: "datetime",
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    }
+                },
+                {
+                    dataField: "title",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "description",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "dueDate",
+                    dataType: "datetime"
+                },
+                {
+                    dataField: "completedDate",
+                    dataType: "datetime"
+                },
+                {
+                    dataField: "priority",
+                    lookup: {
+                        dataSource: [
+                            { value: 0,  display: "Low" },
+                            { value: 1,  display: "Medium" },
+                            { value: 2,  display: "High" },
+                            { value: 3,  display: "Critical" }
+                        ],
+                        displayExpr: 'display',
+                        valueExpr: 'value'
+                    }
+                },
+                {
+                    dataField: "status",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { value: 0,  display: "Not Started" },
+                            { value: 1,  display: "In Progress" },
+                            { value: 2,  display: "Waiting" },
+                            { value: 3,  display: "Review" },
+                            { value: 3,  display: "Completed" },
+                            { value: 3,  display: "Cancelled" }
+                        ],
+                        displayExpr: 'display',
+                        valueExpr: 'value'
+                    }
+                }
+            ],
+            masterDetail: {
+                enabled: true,
+                template: function (container, options) {
+                    $('<h2>').text(`#${options.data.id}' Task Comments:`).appendTo(container);
+
+                    $('<div>').dxDataGrid({
+                        columnsAutoWidth: true,
+                        showBorders: true,
+                        showRowLines: true,
+                        rowAlternationEnable: true,
+                        paging: {
+                            pageSize: 30,
+                        },
+                        loadPanel: {
+                            enabled: true
+                        },
+                        editing: {
+                            mode: "form",
+                            allowUpdating: true,
+                            allowDeleting: true,
+                            allowAdding: true,
+                            useIcons: true,
+                            form: {
+                                items: [{
+                                    itemType: 'group',
+                                    colCount: 2,
+                                    colSpan: 2,
+                                    items: [
+                                        {
+                                            itemType: 'group',
+                                            colCount: 1,
+                                            colSpan: 2,
+                                            items: [{
+                                                dataField: 'comment',
+                                                editorType: 'dxTextArea',
+                                                colSpan: 2,
+                                                editorOptions: {
+                                                    height: 100,
+                                                },
+                                            }],
+                                        }
+                                    ],
+                                }],
+                            }
+                        },
+                        columns: [
+                            {
+                                dataField: "userid",
+                                caption: "User",
+                                allowEditing: false,
+                                formItem: {
+                                    visible: false // Edit formda gözükmez
+                                },
+                                lookup: {
+                                    dataSource: {
+                                        store: storeUser,
+                                        paginate: false
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: function(item) {
+                                        if (!item) {
+                                            return '';
+                                        }
+                                        return `${item.firstname} ${item.lastname}`;
+                                    }
+                                },
+                            },
+                            {
+                                dataField: "createdDate",
+                                dataType: "datetime",
+                                sortOrder: 'desc',
+                                allowEditing: false,
+                                formItem: {
+                                    visible: false // Edit formda gözükmez
+                                }
+                            },
+                            {
+                                dataField: "comment",
+                                validationRules: [{ type: "required" }],
+                            }
+                        ],
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: ["id"],
+                            errorHandler: function (error) { console.log(error) },
+                            load: function (loadOptions) {
+                                var d = $.Deferred();
+                                Sotec.TableOP(
+                                    { type: 'S', tableName: 'TaskComments', keys: { deleted: 0, taskid: options.data.id } },
+                                    function (ret) {
+                                        d.resolve(ret, { totalCount: ret.length });
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            insert: function (values) {
+                                var d = $.Deferred();
+
+                                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.userid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.taskid = options.data.id;
+
+                                Sotec.TableOP(
+                                    { type: 'I', tableName: 'TaskComments', values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            update: function (key, values) {
+                                var d = $.Deferred();
+
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'TaskComments', values: values, keys: key },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            remove: function (key) {
+                                var d = $.Deferred();
+
+                                var values = {};
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+                                values.deleted = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'TaskComments', keys: key, values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+
+                                return d.promise();
+                            }
+                        }),
+                    }).appendTo(container);
+                }
+            }
+        }).dxDataGrid('instance');
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>

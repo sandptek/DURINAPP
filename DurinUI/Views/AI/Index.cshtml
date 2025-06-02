@@ -1,0 +1,472 @@
+﻿@{
+    ViewData["Title"] = "Send Request";
+}
+@section Scripts {
+    <script>
+        $("#alert").hide();
+
+        const frm_mci = document.getElementById('frm_mci');
+        const frm_pd = document.getElementById('frm_pd');
+
+        var validator_mci = FormValidation.formValidation(
+            frm_mci,
+            {
+                fields: {
+                    'AGE': {
+                        validators: {
+                            notEmpty: {
+                                message: 'AGE input is required'
+                            }
+                        }
+                    },
+                    'M31944': {
+                        validators: {
+                            notEmpty: {
+                                message: 'M31944 input is required'
+                            }
+                        }
+                    },
+                    'HSH2D': {
+                        validators: {
+                            notEmpty: {
+                                message: 'HSH2D input is required'
+                            }
+                        }
+                    },
+                    'KAPPA': {
+                        validators: {
+                            notEmpty: {
+                                message: 'KAPPA input is required'
+                            }
+                        }
+                    },
+                    'GCDH': {
+                        validators: {
+                            notEmpty: {
+                                message: 'GCDH input is required'
+                            }
+                        }
+                    },
+                    'CCL19': {
+                        validators: {
+                            notEmpty: {
+                                message: 'CCL19 input is required'
+                            }
+                        }
+                    },
+                    'LGALS1': {
+                        validators: {
+                            notEmpty: {
+                                message: 'LGALS1 input is required'
+                            }
+                        }
+                    },
+                    'DNAJC8': {
+                        validators: {
+                            notEmpty: {
+                                message: 'DNAJC8 input is required'
+                            }
+                        }
+                    },
+                    'ICAM4': {
+                        validators: {
+                            notEmpty: {
+                                message: 'ICAM4 input is required'
+                            }
+                        }
+                    },
+                },
+
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',
+                        eleValidClass: ''
+                    })
+                }
+            }
+        );
+        var validator_pd = FormValidation.formValidation(
+            frm_pd,
+            {
+                fields: {
+                    'MARK1': {
+                        validators: {
+                            notEmpty: {
+                                message: 'MARK1 input is required'
+                            }
+                        }
+                    },
+                    'CCL19': {
+                        validators: {
+                            notEmpty: {
+                                message: 'CCL19 input is required'
+                            }
+                        }
+                    },
+                    'PUSL1': {
+                        validators: {
+                            notEmpty: {
+                                message: 'PUSL1 input is required'
+                            }
+                        }
+                    },
+                    'IL20': {
+                        validators: {
+                            notEmpty: {
+                                message: 'IL20 input is required'
+                            }
+                        }
+                    },
+                },
+
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row-2',
+                        eleInvalidClass: '',
+                        eleValidClass: ''
+                    })
+                }
+            }
+        );
+
+        $('#btn1').dxButton({
+            stylingMode: 'contained',
+            text: 'Test Butonu',
+            type: 'normal',
+            width: 120,
+            onClick() {
+                DevExpress.ui.notify('Script dosyaları başarılı bir şekilde kuruldu');
+            },
+        });
+
+        function GetMCI() {
+            $("#alert").hide();
+            if (validator_mci) {
+                validator_mci.validate().then(function (status) {
+                    if (status == 'Valid') {
+                        Sotec.GetData(
+                            {
+                                url: "/AI/GetMCI",
+                                method: "POST",
+                                data: {
+                                    TYPE: "MCI",
+                                    AGE: $("#inp_AGE").val(),
+                                    M31944: $("#inp_M31944").val(),
+                                    HSH2D: $("#inp_HSH2D").val(),
+                                    KAPPA: $("#inp_KAPPA").val(),
+                                    GCDH: $("#inp_GCDH").val(),
+                                    CCL19: $("#inp_CCL19").val(),
+                                    LGALS1: $("#inp_LGALS1").val(),
+                                    DNAJC8: $("#inp_DNAJC8").val(),
+                                    ICAM4: $("#inp_ICAM4").val()
+                                }
+                            },
+                            function (ret) {
+                                console.log(ret);
+
+                                let txt = "Prediction is " + (ret.prediction == "CON" ? "Negative" : "Positive") + " | " + ret.score[0] + " - " + ret.score[1];
+                                $("#alert_header").html("MCI Prediction");
+                                $("#alert_text").html(txt);
+                                $("#alert").show();
+                            },
+                            function (ret) {
+                                DevExpress.ui.notify(ret);
+                            }
+                        );
+                    }
+                    else {
+                        DevExpress.ui.notify("Plese insert CSV data!");
+                    }
+                });
+            }
+        }
+
+        function GetPD() {
+            $("#alert").hide();
+            if (validator_pd) {
+                validator_pd.validate().then(function (status) {
+                    if (status == 'Valid') {
+                        Sotec.GetData(
+                            {
+                                url: "/AI/GetPD",
+                                method: "POST",
+                                data: {
+                                    TYPE: "PD",
+                                    MARK1: $("#inp_MARK1").val(),
+                                    CCL19: $("#inp_CCL19-2").val(),
+                                    PUSL1: $("#inp_PUSL1").val(),
+                                    IL20: $("#inp_IL20").val()
+                                }
+                            },
+                            function (ret) {
+                                console.log(ret);
+
+                                let txt = "Prediction is " + (ret.prediction == "CON" ? "Negative" : "Positive") + " | " + ret.score[0] + " - " + ret.score[1];
+                                $("#alert_header").html("PD Prediction");
+                                $("#alert_text").html(txt);
+                                $("#alert").show();
+                            },
+                            function (ret) {
+                                DevExpress.ui.notify(ret);
+                            }
+                        );
+                    }
+                    else {
+                        DevExpress.ui.notify("Plese insert CSV data!");
+                    }
+                });
+            }
+        }
+
+        function MCILoadFromCSV() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = ".csv";
+
+            input.onchange = e => {
+
+                // getting a hold of the file reference
+                var file = e.target.files[0];
+
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(file, 'UTF-8');
+
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result; // this is the content!
+
+                    const lines = content.split("\r\n");
+                    if (lines.length <= 0) {
+                        DevExpress.ui.notify("CSV file data is wrong, plese check and try again.");
+                    }
+                    else {
+                        const myArray = lines[0].split(",");
+
+                        if (myArray.length >= 9) {
+                            for (let i = 0; i < myArray.length; i++) {
+                                if (i == 0) {
+                                    $("#inp_AGE").val(myArray[i]);
+                                }
+                                else if (i == 1) {
+                                    $("#inp_M31944").val(myArray[i]);
+                                }
+                                else if (i == 2) {
+                                    $("#inp_HSH2D").val(myArray[i]);
+                                }
+                                else if (i == 3) {
+                                    $("#inp_KAPPA").val(myArray[i]);
+                                }
+                                else if (i == 4) {
+                                    $("#inp_GCDH").val(myArray[i]);
+                                }
+                                else if (i == 5) {
+                                    $("#inp_CCL19").val(myArray[i]);
+                                }
+                                else if (i == 6) {
+                                    $("#inp_LGALS1").val(myArray[i]);
+                                }
+                                else if (i == 7) {
+                                    $("#inp_DNAJC8").val(myArray[i]);
+                                }
+                                else if (i == 8) {
+                                    $("#inp_ICAM4").val(myArray[i]);
+                                }
+                            }
+                        }
+                        else {
+                            DevExpress.ui.notify("CSV file data is wrong, plese check and try again.");
+                        }
+                    }
+                }
+
+            }
+
+            input.click();
+        }
+
+        function PDLoadFromCSV() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = ".csv";
+
+            input.onchange = e => {
+
+                // getting a hold of the file reference
+                var file = e.target.files[0];
+
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(file, 'UTF-8');
+
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result; // this is the content!
+
+                    const lines = content.split("\r\n");
+                    if (lines.length <= 0) {
+                        DevExpress.ui.notify("CSV file data is wrong, plese check and try again.");
+                    }
+                    else {
+                        const myArray = lines[0].split(",");
+
+                        if (myArray.length >= 4) {
+                            for (let i = 0; i < myArray.length; i++) {
+                                if (i == 0) {
+                                    $("#inp_MARK1").val(myArray[i]);
+                                }
+                                else if (i == 1) {
+                                    $("#inp_CCL19-2").val(myArray[i]);
+                                }
+                                else if (i == 2) {
+                                    $("#inp_PUSL1").val(myArray[i]);
+                                }
+                                else if (i == 3) {
+                                    $("#inp_IL20").val(myArray[i]);
+                                }
+                            }
+                        }
+                        else {
+                            DevExpress.ui.notify("CSV file data is wrong, plese check and try again.");
+                        }
+                    }
+
+
+                }
+
+            }
+
+            input.click();
+        }
+    </script>
+}
+<div class="row clearfix">
+    <div class="col-md-12" id="alert">
+        <!--begin::Alert-->
+        <div class="alert alert-primary d-flex align-items-center p-5">
+            <!--begin::Icon-->
+            <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+            <!--end::Icon-->
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column">
+                <!--begin::Title-->
+                <h4 class="mb-1 text-dark" id="alert_header">This is an alert</h4>
+                <!--end::Title-->
+                <!--begin::Content-->
+                <span id="alert_text">The alert component can be used to highlight certain parts of your page for higher content visibility.</span>
+                <!--end::Content-->
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Alert-->
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 offset-md-4 mb-10">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5 fv-row">
+                <div class="row mb-10">
+                    <div class="col-md-6">
+                        <h2>AD</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <a href="#" onclick="MCILoadFromCSV()" class="btn btn-secondary">Upload</a>
+                    </div>
+                </div>
+                <form id="frm_mci" class="form" action="#" autocomplete="off">
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-12">
+                            <label for="" class="form-label">Age</label>
+                            <input class="form-control" placeholder="AGE" name="AGE" id="inp_AGE" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">M31944</label>
+                            <input class="form-control" placeholder="M31944" name="M31944" id="inp_M31944" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">HSH2D</label>
+                            <input class="form-control" placeholder="HSH2D" name="HSH2D" id="inp_HSH2D" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">KAPPA</label>
+                            <input class="form-control" placeholder="KAPPA" name="KAPPA" id="inp_KAPPA" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">GCDH</label>
+                            <input class="form-control" placeholder="GCDH" name="GCDH" id="inp_GCDH" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">CCL19</label>
+                            <input class="form-control" placeholder="CCL19" name="CCL19" id="inp_CCL19" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">LGALS1</label>
+                            <input class="form-control" placeholder="LGALS1" name="LGALS1" id="inp_LGALS1" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">DNAJC8</label>
+                            <input class="form-control" placeholder="DNAJC8" name="DNAJC8" id="inp_DNAJC8" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">ICAM4</label>
+                            <input class="form-control" placeholder="ICAM4" name="ICAM4" id="inp_ICAM4" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <a href="#" onclick="GetMCI()" class="btn btn-primary">Start Analysis</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @* <div class="col-md-4 offset-md-4">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5 fv-row-2">
+                <div class="row">
+                    <div class="col-md-6 mb-10">
+                        <h2>PD</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <a href="#" onclick="PDLoadFromCSV()" class="btn btn-secondary">Upload</a>
+                    </div>
+                </div>
+                <form id="frm_pd" class="form" action="#" autocomplete="off">
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">MARK1</label>
+                            <input class="form-control" placeholder="MARK1" name="MARK1" id="inp_MARK1" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">CCL19</label>
+                            <input class="form-control" placeholder="CCL19" name="CCL19" id="inp_CCL19-2" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-10" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">PUSL1</label>
+                            <input class="form-control" placeholder="PUSL1" name="PUSL1" id="inp_PUSL1" type="number" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">IL20</label>
+                            <input class="form-control" placeholder="IL20" name="IL20" id="inp_IL20" type="number" disabled>
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <a href="#" onclick="GetPD()" class="btn btn-primary">Start Analysis</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> *@
+</div>

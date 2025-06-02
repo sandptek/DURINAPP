@@ -1,0 +1,322 @@
+﻿@{
+    ViewData["Title"] = "Affiliation";
+}
+@section Scripts {
+    <script>
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Hospitals', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'Hospitals', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Hospitals', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                Sotec.GetData({ url: "/Hospital/CanDelete", data: { id: key.id } },
+                    function (ret) {
+                        var values = {};
+                        values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                        values.updatedDate = new Date();
+                        values.deleted = 1;
+
+                        Sotec.TableOP(
+                            { type: 'U', tableName: 'Hospitals', keys: key, values: values },
+                            function (ret) {
+                                d.resolve();
+                            },
+                            function (ret) {
+                                DevExpress.ui.notify(ret, "error", 5000);
+                                d.resolve();
+                            }
+                        );
+                    },
+                    function (ret) {
+                        d.resolve();
+                        Swal.fire({
+                            text: ret.responseText,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonColor: "#00adb5",
+                            confirmButtonText: "Try Again",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                );
+
+                return d.promise();
+            }
+        });
+        var storeDoctor = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: true,
+                allowDeleting: true,
+                allowAdding: true,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "name",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "officalName"
+                }, 
+                {
+                    dataField: "phone"
+                }, 
+                {
+                    dataField: "email"
+                }, 
+                {
+                    dataField: "officerName"
+                }, 
+                {
+                    dataField: "officerPhone"
+                },
+                {
+                    dataField: "stateOrProvinceCode"
+                },
+                {
+                    dataField: "city"
+                },
+                {
+                    dataField: "address"
+                },
+                {
+                    dataField: "countryCode"
+                },
+                {
+                    dataField: "postalCode"
+                }
+            ],
+            masterDetail: {
+                enabled: true,
+                template: function (container, options) {
+                    $('<h2>').text(`#${options.data.id} Doctors:`).appendTo(container);
+
+                    $('<div>').dxDataGrid({
+                        columnsAutoWidth: true,
+                        showBorders: true,
+                        showRowLines: true,
+                        rowAlternationEnable: true,
+                        paging: {
+                            pageSize: 30,
+                        },
+                        loadPanel: {
+                            enabled: true
+                        },
+                        editing: {
+                            mode: "form",
+                            allowUpdating: true,
+                            allowDeleting: true,
+                            allowAdding: true,
+                            useIcons: true,
+                        },
+                        columns: [
+                            {
+                                dataField: "userid",
+                                caption: "Doctor",
+                                validationRules: [{ type: "required" }],
+                                lookup: {
+                                    dataSource: {
+                                        store: storeDoctor,
+                                        paginate: false
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: getDisplayUser
+                                },
+                            }
+                        ],
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: ["id"],
+                            errorHandler: function (error) { console.log(error) },
+                            load: function (loadOptions) {
+                                var d = $.Deferred();
+                                Sotec.TableOP(
+                                    { type: 'S', tableName: 'HospitalUsers', keys: { deleted: 0, hospitalid: options.data.id } },
+                                    function (ret) {
+                                        d.resolve(ret, { totalCount: ret.length });
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            insert: function (values) {
+                                var d = $.Deferred();
+
+                                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.hospitalid = options.data.id;
+
+                                Sotec.TableOP(
+                                    { type: 'I', tableName: 'HospitalUsers', values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            update: function (key, values) {
+                                var d = $.Deferred();
+
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'HospitalUsers', values: values, keys: key },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            remove: function (key) {
+                                var d = $.Deferred();
+
+                                var values = {};
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+                                values.deleted = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'HospitalUsers', keys: key, values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            }
+                        }),
+                    }).appendTo(container);
+                }
+            }
+        }).dxDataGrid('instance');
+
+        function getDisplayUser(item) {
+            if (!item) {
+                return '';
+            }
+            return `${item.firstname} ${item.lastname}`;
+        }
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>

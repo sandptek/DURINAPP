@@ -1,0 +1,298 @@
+﻿@{
+    ViewData["Title"] = "R&D";
+}
+@section Styles {
+    <style>
+        .custom-toolbar-text {
+            font-size: 13px;
+            margin-right: 200px;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        var errors = [];
+        var dsTests = [];
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: dsTests,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 50,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "cell",
+                allowUpdating: true,
+                allowDeleting: false,
+                allowAdding: false,
+                useIcons: true
+            },
+            toolbar: {
+                items: [
+                    {
+                        location: "after",
+                        widget: "dxButton",
+                        options: {
+                            icon: "upload",
+                            text: "Upload",
+                            onClick: function () {
+                                var fileDialog = $('<input type="file" accept=".csv" multiple>');
+                                fileDialog.click();
+                                fileDialog.on("change",onFileSelected);
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        location: "after",
+                        widget: "dxButton",
+                        options: {
+                            icon: "arrowright",
+                            text: "Send Request",
+                            onClick: function () {
+                                let dataSource = $("#dgTable").dxDataGrid("instance").getDataSource();
+                                if (dataSource._items.length <= 0) {
+                                    DevExpress.ui.notify("Please upload samples", "error", 5000);
+                                }
+
+                                let isNull = false;
+                                dataSource._items.forEach(obj => {
+                                    if (obj.age === 0 || obj.age === null) {
+                                        console.log();
+                                        DevExpress.ui.notify(`Value is 0 for sample ${obj.sample}`, "error", 5000);
+                                        isNull = true;
+                                    }
+                                });
+
+                                if (!isNull) {
+                                    $.ajax({
+                                        url: '/AI/SendML', // Controller'daki route ile uyumlu olmalı
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(dataSource._items),
+                                        success: function (response) {
+                                                Swal.fire({
+                                                    icon: 'success',
+                                                    title: 'Request Send',
+                                                    text: 'You will be notified by email when the tests are completed.',
+                                                    confirmButtonText: 'Ok'
+                                                });
+                                                $("#dgTable").dxDataGrid("instance").option("dataSource", []);
+                                        },
+                                        error: function (error) {
+                                            DevExpress.ui.notify("Something went wrong", "error", 5000);
+                                        }
+                                    });
+
+                                    console.log(dataSource);
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            columns: [
+                {
+                    dataField: "sample",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "age",
+                    dataType: "number",
+                },
+                {
+                    dataField: "mgC31944",
+                    dataType: "number",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "ccL19",
+                    dataType: "number",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "dnajC8",
+                    dataType: "number",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "lgalS1",
+                    dataType: "number",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "marK1",
+                    dataType: "number",
+                    allowEditing: false,
+                    visible: false,
+                },
+                {
+                    dataField: "pusL1",
+                    dataType: "number",
+                    allowEditing: false,
+                    visible: false,
+                },
+                {
+                    dataField: "iL20",
+                    dataType: "number",
+                    allowEditing: false,
+                    visible: false,
+                },
+                {
+                    dataField: "kappa",
+                    dataType: "number",
+                    allowEditing: false,
+                }
+            ]
+        }).dxDataGrid('instance');
+
+        function getDisplayUser(item) {
+            if (!item) {
+                return '';
+            }
+            return `${item.firstname} ${item.lastname}`;
+        }
+
+        var onFileSelected = function(e){
+            var files = $(this)[0].files;
+            if (files.length > 0) {
+                var that = this;
+                var formData = new FormData();
+
+                if ($(this)[0].files.length != 2) {
+                    DevExpress.ui.notify("Plese choose 2 csv file.", "error", 5000);
+                }
+                else {
+                    // add assoc key values, this will be posts values
+                    formData.append("csvFile", $(this)[0].files[0], $(this)[0].files[0].name);
+                    formData.append("csvFile", $(this)[0].files[1], $(this)[0].files[1].name);
+                    formData.append("upload_file", true);
+
+                    Swal.showLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: "/AI/UploadTest",
+                        success: function (data) {
+                            console.log(data);
+
+                            if (data.errors.length > 0) {
+                                const dataSourceErrors = data.errors.map(item => ({ value: item }));
+                                errors = dataSourceErrors;
+                                const dataSourceADNIS = data.adnis;
+                                $('#dgCsvErrors').dxDataGrid({
+                                    dataSource: dataSourceErrors,
+                                    columnsAutoWidth: true,
+                                    showBorders: true,
+                                    showRowLines: true,
+                                    showColumnHeaders: false,
+                                    rowAlternationEnable: true,
+                                    toolbar: {
+                                        items: [
+                                            {
+                                                location: 'before', // 'before', 'after' veya 'center' olabilir
+                                                template: function () {
+                                                    return $("<div>").addClass("custom-toolbar-text").text("Data has been uploaded please fill in the age fields for the examples taking into account the errors listed below.");
+                                                }
+                                            },
+                                            {
+                                                widget: 'dxButton',
+                                                visible: true,//data.canSave,
+                                                options: {
+                                                    text: 'Fill the Ages',
+                                                    icon: 'add',
+                                                    onClick(e) {
+                                                        $('#kt_modal_csv_errors').modal('hide');
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    paging: {
+                                        pageSize: 30,
+                                    },
+                                    loadPanel: {
+                                        enabled: true
+                                        },
+                                    columns: [{
+                                        dataField: "value"
+                                    }],
+                                }).dxDataGrid('instance');
+                                $("#dgTable").dxDataGrid("instance").option("dataSource", dataSourceADNIS);
+                                Swal.close();
+                                $('#kt_modal_csv_errors').modal('show');
+                            }
+                            else {
+                                DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                                $('#dgTable').dxDataGrid("instance").refresh();
+                            }
+                        },
+                        error: function (error) {
+                            DevExpress.ui.notify(error, "error", 5000);
+                            Swal.close();
+                        },
+                        async: true,
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        timeout: 600000
+                    });
+                }
+            }
+            else {
+                DevExpress.ui.notify("No file selected.", "error", 5000);
+            }
+        };
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--begin::Modal - Create App-->
+<div class="modal fade" id="kt_modal_csv_errors" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-800px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2>Upload File Requests</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-x"></i>
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body py-lg-10 px-lg-10">
+                <div id="dgCsvErrors"></div>
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Create App-->

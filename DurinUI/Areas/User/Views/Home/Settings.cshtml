@@ -1,0 +1,631 @@
+﻿@model Entities.DB.User
+@{
+}
+@section Scripts {
+	<script>
+		"use strict";
+		var KTAccountSettingsSigninMethods = function () {
+			var t, e, n, o, i, s, r, a, l, d = function () {
+				e.classList.toggle("d-none"), s.classList.toggle("d-none"), n.classList.toggle("d-none")
+			},
+				c = function () {
+					o.classList.toggle("d-none"), a.classList.toggle("d-none"), i.classList.toggle("d-none")
+				};
+			return {
+				init: function () {
+					var m;
+					t = document.getElementById("kt_signin_change_email"), e = document.getElementById("kt_signin_email"), n = document.getElementById("kt_signin_email_edit"), o = document.getElementById("kt_signin_password"), i = document.getElementById("kt_signin_password_edit"), s = document.getElementById("kt_signin_email_button"), r = document.getElementById("kt_signin_cancel"), a = document.getElementById("kt_signin_password_button"), l = document.getElementById("kt_password_cancel"), e && (s.querySelector("button").addEventListener("click", (function () {
+						d()
+					})), r.addEventListener("click", (function () {
+						d()
+					})), a.querySelector("button").addEventListener("click", (function () {
+						c()
+					})), l.addEventListener("click", (function () {
+						c()
+					}))), t && (m = FormValidation.formValidation(t, {
+						fields: {
+							email: {
+								validators: {
+									notEmpty: {
+										message: "Email is required"
+									},
+									emailAddress: {
+										message: "The value is not a valid email address"
+									}
+								}
+							},
+							password: {
+								validators: {
+									notEmpty: {
+										message: "Password is required"
+									}
+								}
+							}
+						},
+						plugins: {
+							trigger: new FormValidation.plugins.Trigger,
+							bootstrap: new FormValidation.plugins.Bootstrap5({
+								rowSelector: ".fv-row"
+							})
+						}
+					}), t.querySelector("#kt_signin_submit").addEventListener("click", (function (e) {
+						e.preventDefault(), console.log("click"), m.validate().then((
+							function (e) {
+								"Valid" == e ? 
+									Sotec.GetData(
+										{ url: "/User/Home/UpdateEmail", data: { email: document.querySelector('#kt_signin_change_email').querySelector('[name="email"]').value, password: document.querySelector('#kt_signin_change_email').querySelector('[name="password"]').value } },
+										function (ret) {
+											Swal.fire({
+												text: "Email succesfully changed.",
+												icon: "success",
+												buttonsStyling: false,
+												confirmButtonColor: "#00adb5",
+												confirmButtonText: "OK",
+												customClass: {
+													confirmButton: "btn btn-primary"
+												}
+											});
+										},
+										function (ret) {
+											Swal.hideLoading();
+											Swal.fire({
+												text: ret.responseText,
+												icon: "error",
+												buttonsStyling: false,
+												confirmButtonColor: "#00adb5",
+												confirmButtonText: "Try Again",
+												customClass: {
+													confirmButton: "btn btn-primary"
+												}
+											});
+										}
+									)
+									: 
+									swal.fire({
+										text: "Sorry, looks like there are some errors detected, please try again.",
+										icon: "error",
+										buttonsStyling: !1,
+										confirmButtonText: "Ok, got it!",
+										customClass: {
+											confirmButton: "btn font-weight-bold btn-light-primary"
+										}
+									})
+							}
+						))
+
+						Sotec.GetData();
+
+					}))),
+						function (t) {
+							var e, n = document.getElementById("kt_signin_change_password");
+							n && (e = FormValidation.formValidation(n, {
+								fields: {
+									currentpassword: {
+										validators: {
+											notEmpty: {
+												message: "Current Password is required"
+											}
+										}
+									},
+									newpassword: {
+										validators: {
+											notEmpty: {
+												message: "New Password is required"
+											}
+										}
+									},
+									confirmpassword: {
+										validators: {
+											notEmpty: {
+												message: "Confirm Password is required"
+											},
+											identical: {
+												compare: function () {
+													return n.querySelector('[name="newpassword"]').value
+												},
+												message: "The password and its confirm are not the same"
+											}
+										}
+									}
+								},
+								plugins: {
+									trigger: new FormValidation.plugins.Trigger,
+									bootstrap: new FormValidation.plugins.Bootstrap5({
+										rowSelector: ".fv-row"
+									})
+								}
+							}), n.querySelector("#kt_password_submit").addEventListener("click", (function (t) {
+								t.preventDefault(), console.log("click"), e.validate().then((function (t) {
+									"Valid" == t ? 
+									Sotec.GetData(
+											{ url: "/User/Home/UpdatePassword", data: { oldPassword: document.querySelector('#kt_signin_change_password').querySelector('[name="currentpassword"]').value, newPassword: document.querySelector('#kt_signin_change_password').querySelector('[name="newpassword"]').value } },
+										function (ret) {
+											Swal.fire({
+												text: "Password succesfully changed.",
+												icon: "success",
+												buttonsStyling: false,
+												confirmButtonColor: "#00adb5",
+												confirmButtonText: "OK",
+												customClass: {
+													confirmButton: "btn btn-primary"
+												}
+											});
+										},
+										function (ret) {
+											Swal.hideLoading();
+											Swal.fire({
+												text: ret.responseText,
+												icon: "error",
+												buttonsStyling: false,
+												confirmButtonColor: "#00adb5",
+												confirmButtonText: "Try Again",
+												customClass: {
+													confirmButton: "btn btn-primary"
+												}
+											});
+										}
+									) : swal.fire({
+										text: "Sorry, looks like there are some errors detected, please try again.",
+										icon: "error",
+										buttonsStyling: !1,
+										confirmButtonText: "Ok, got it!",
+										customClass: {
+											confirmButton: "btn font-weight-bold btn-light-primary"
+										}
+									})
+								}))
+							})))
+						}()
+				}
+			}
+		}();
+		KTUtil.onDOMContentLoaded((function () {
+			KTAccountSettingsSigninMethods.init()
+		}));
+	</script>
+}
+<!--begin::Basic info-->
+<div class="card mb-5 mb-xl-10">
+	<!--begin::Card header-->
+	<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+		<!--begin::Card title-->
+		<div class="card-title m-0">
+			<h3 class="fw-bold m-0">Profile Details</h3>
+		</div>
+		<!--end::Card title-->
+	</div>
+	<!--begin::Card header-->
+	<!--begin::Content-->
+	<div id="kt_account_settings_profile_details" class="collapse show">
+		<!--begin::Form-->
+		<form method="POST" action="/User/Home/UpdateSettings" class="form">
+			<!--begin::Card body-->
+			<div class="card-body border-top p-9">
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">Full Name</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8">
+						<!--begin::Row-->
+						<div class="row">
+							<!--begin::Col-->
+							<div class="col-lg-6 fv-row">
+								<input type="text" name="name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" placeholder="First name" value="@Model.firstname" required/>
+							</div>
+							<!--end::Col-->
+							<!--begin::Col-->
+							<div class="col-lg-6 fv-row">
+								<input type="text" name="surname" class="form-control form-control-lg form-control-solid" placeholder="Last name" value="@Model.lastname" required/>
+							</div>
+							<!--end::Col-->
+						</div>
+						<!--end::Row-->
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">Date of Birth</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="date" name="dateOfBirth" class="form-control form-control-lg form-control-solid" placeholder="Date of Birth" value="@(Model.dateOfBirth == null ? null : Model.dateOfBirth.Value.ToString("yyyy-MM-dd"))" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">Gender</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<select name="gender" aria-label="Select a Gender" data-control="select2" data-placeholder="Select a gender.." class="form-select form-select-solid form-select-lg" asp-for="@Model.gender">
+							<option value="">Select a gender..</option>
+							<option value="M">
+								Male
+							</option>
+							<option value="F">
+								Female
+							</option>
+							<option value="NB">
+								Non-Binary
+							</option>
+							<option value="TM">
+								Transgender Man
+							</option>
+							<option value="TW">
+								Transgender Woman
+							</option>
+							<option value="-">
+								Prefer Not to Disclose
+							</option>
+						</select>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">Company</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="text" name="company" class="form-control form-control-lg form-control-solid" placeholder="Company name" value="@Model.company" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">
+						<span class="">Contact Phone</span>
+						<span class="ms-1" data-bs-toggle="tooltip" title="Phone number must be active">
+							<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+								<span class="path1"></span>
+								<span class="path2"></span>
+								<span class="path3"></span>
+							</i>
+						</span>
+					</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder="Phone number" value="@Model.phone" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">
+						<span class="">Fax</span>
+					</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="tel" name="fax" class="form-control form-control-lg form-control-solid" placeholder="Fax number" value="@Model.fax" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">Address</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="text" name="address" class="form-control form-control-lg form-control-solid" placeholder="Address" value="@Model.address" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">ZIP Code</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="text" name="postalCode" class="form-control form-control-lg form-control-solid" placeholder="ZIP code" value="@Model.postalCode" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">Country</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<select name="countryCode" aria-label="Select a country" data-control="select2" data-placeholder="Select a country.." class="form-select form-select-solid form-select-lg" asp-for="@Model.countryCode">
+							<option value="">Select a country..</option>
+							<option value="US">
+								US
+							</option>
+						</select>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">State</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<select name="stateOrProvinceCode" aria-label="Select a state" data-control="select2" data-placeholder="Select a state.." class="form-select form-select-solid form-select-lg" asp-for="@Model.stateOrProvinceCode">
+							<option value="">Select a state..</option>
+							<option value="AL">Alabama</option>
+							<option value="AK">Alaska</option>
+							<option value="AZ">Arizona</option>
+							<option value="AR">Arkansas</option>
+							<option value="CA">California</option>
+							<option value="CO">Colorado</option>
+							<option value="CT">Connecticut</option>
+							<option value="DE">Delaware</option>
+							<option value="FL">Florida</option>
+							<option value="GA">Georgia</option>
+							<option value="HI">Hawaii</option>
+							<option value="ID">Idaho</option>
+							<option value="IL">Illinois</option>
+							<option value="IN">Indiana</option>
+							<option value="IA">Iowa</option>
+							<option value="KS">Kansas</option>
+							<option value="KY">Kentucky</option>
+							<option value="LA">Louisiana</option>
+							<option value="ME">Maine</option>
+							<option value="MD">Maryland</option>
+							<option value="MA">Massachusetts</option>
+							<option value="MI">Michigan</option>
+							<option value="MN">Minnesota</option>
+							<option value="MS">Mississippi</option>
+							<option value="MO">Missouri</option>
+							<option value="MT">Montana</option>
+							<option value="NE">Nebraska</option>
+							<option value="NV">Nevada</option>
+							<option value="NH">New Hampshire</option>
+							<option value="NJ">New Jersey</option>
+							<option value="NM">New Mexico</option>
+							<option value="NY">New York</option>
+							<option value="NC">North Carolina</option>
+							<option value="ND">North Dakota</option>
+							<option value="OH">Ohio</option>
+							<option value="OK">Oklahoma</option>
+							<option value="OR">Oregon</option>
+							<option value="PA">Pennsylvania</option>
+							<option value="RI">Rhode Island</option>
+							<option value="SC">South Carolina</option>
+							<option value="SD">South Dakota</option>
+							<option value="TN">Tennessee</option>
+							<option value="TX">Texas</option>
+							<option value="UT">Utah</option>
+							<option value="VT">Vermont</option>
+							<option value="VA">Virginia</option>
+							<option value="WA">Washington</option>
+							<option value="WV">West Virginia</option>
+							<option value="WI">Wisconsin</option>
+							<option value="WY">Wyoming</option>
+						</select>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">City</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="text" name="city" class="form-control form-control-lg form-control-solid" placeholder="City" value="@Model.city" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+
+
+
+
+
+
+
+
+			</div>
+			<!--end::Card body-->
+			<!--begin::Actions-->
+			<div class="card-footer d-flex justify-content-end py-6 px-9">
+				<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>
+				<button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>
+			</div>
+			<!--end::Actions-->
+		</form>
+		<!--end::Form-->
+	</div>
+	<!--end::Content-->
+</div>
+<!--end::Basic info-->
+<!--begin::Sign-in Method-->
+<div class="card mb-5 mb-xl-10">
+	<!--begin::Card header-->
+	<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_signin_method">
+		<div class="card-title m-0">
+			<h3 class="fw-bold m-0">Sign-in Method</h3>
+		</div>
+	</div>
+	<!--end::Card header-->
+	<!--begin::Content-->
+	<div id="kt_account_settings_signin_method" class="collapse show">
+		<!--begin::Card body-->
+		<div class="card-body border-top p-9">
+			<!--begin::Email Address-->
+			<div class="d-flex flex-wrap align-items-center">
+				<!--begin::Label-->
+				<div id="kt_signin_email">
+					<div class="fs-6 fw-bold mb-1">Email Address</div>
+					<div class="fw-semibold text-gray-600">@Model.email</div>
+				</div>
+				<!--end::Label-->
+				<!--begin::Edit-->
+				<div id="kt_signin_email_edit" class="flex-row-fluid d-none">
+					<!--begin::Form-->
+					<form id="kt_signin_change_email" class="form" novalidate="novalidate">
+						<div class="row mb-6">
+							<div class="col-lg-6 mb-4 mb-lg-0">
+								<div class="fv-row mb-0">
+									<label for="emailaddress" class="form-label fs-6 fw-bold mb-3">Enter New Email Address</label>
+									<input type="email" class="form-control form-control-lg form-control-solid" id="emailaddress" placeholder="Email Address" name="email" value="@Model.email" />
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="fv-row mb-0">
+									<label for="confirmemailpassword" class="form-label fs-6 fw-bold mb-3">Confirm Password</label>
+									<input type="password" class="form-control form-control-lg form-control-solid" name="password" id="confirmemailpassword" />
+								</div>
+							</div>
+						</div>
+						<div class="d-flex">
+							<button id="kt_signin_submit" type="button" class="btn btn-primary me-2 px-6">Update Email</button>
+							<button id="kt_signin_cancel" type="button" class="btn btn-color-gray-500 btn-active-light-primary px-6">Cancel</button>
+						</div>
+					</form>
+					<!--end::Form-->
+				</div>
+				<!--end::Edit-->
+				<!--begin::Action-->
+				<div id="kt_signin_email_button" class="ms-auto">
+					<button class="btn btn-light btn-active-light-primary">Change Email</button>
+				</div>
+				<!--end::Action-->
+			</div>
+			<!--end::Email Address-->
+			<!--begin::Separator-->
+			<div class="separator separator-dashed my-6"></div>
+			<!--end::Separator-->
+			<!--begin::Password-->
+			<div class="d-flex flex-wrap align-items-center mb-10">
+				<!--begin::Label-->
+				<div id="kt_signin_password">
+					<div class="fs-6 fw-bold mb-1">Password</div>
+					<div class="fw-semibold text-gray-600">************</div>
+				</div>
+				<!--end::Label-->
+				<!--begin::Edit-->
+				<div id="kt_signin_password_edit" class="flex-row-fluid d-none">
+					<!--begin::Form-->
+					<form id="kt_signin_change_password" class="form" novalidate="novalidate">
+						<div class="row mb-1">
+							<div class="col-lg-4">
+								<div class="fv-row mb-0">
+									<label for="currentpassword" class="form-label fs-6 fw-bold mb-3">Current Password</label>
+									<input type="password" class="form-control form-control-lg form-control-solid" name="currentpassword" id="currentpassword" />
+								</div>
+							</div>
+							<div class="col-lg-4">
+								<div class="fv-row mb-0">
+									<label for="newpassword" class="form-label fs-6 fw-bold mb-3">New Password</label>
+									<input type="password" class="form-control form-control-lg form-control-solid" name="newpassword" id="newpassword" />
+								</div>
+							</div>
+							<div class="col-lg-4">
+								<div class="fv-row mb-0">
+									<label for="confirmpassword" class="form-label fs-6 fw-bold mb-3">Confirm New Password</label>
+									<input type="password" class="form-control form-control-lg form-control-solid" name="confirmpassword" id="confirmpassword" />
+								</div>
+							</div>
+						</div>
+						<div class="form-text mb-5">Password must be at least 8 character and contain symbols</div>
+						<div class="d-flex">
+							<button id="kt_password_submit" type="button" class="btn btn-primary me-2 px-6">Update Password</button>
+							<button id="kt_password_cancel" type="button" class="btn btn-color-gray-500 btn-active-light-primary px-6">Cancel</button>
+						</div>
+					</form>
+					<!--end::Form-->
+				</div>
+				<!--end::Edit-->
+				<!--begin::Action-->
+				<div id="kt_signin_password_button" class="ms-auto">
+					<button class="btn btn-light btn-active-light-primary">Reset Password</button>
+				</div>
+				<!--end::Action-->
+			</div>
+			<!--end::Password-->
+		</div>
+		<!--end::Card body-->
+	</div>
+	<!--end::Content-->
+</div>
+<!--end::Sign-in Method-->
+@*
+<!--begin::Deactivate Account-->
+<div class="card">
+	<!--begin::Card header-->
+	<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_deactivate" aria-expanded="true" aria-controls="kt_account_deactivate">
+		<div class="card-title m-0">
+			<h3 class="fw-bold m-0">Deactivate Account</h3>
+		</div>
+	</div>
+	<!--end::Card header-->
+	<!--begin::Content-->
+	<div id="kt_account_settings_deactivate" class="collapse show">
+		<!--begin::Form-->
+		<form id="kt_account_deactivate_form" class="form">
+			<!--begin::Card body-->
+			<div class="card-body border-top p-9">
+				<!--begin::Notice-->
+				<div class="notice d-flex bg-light-warning rounded border-warning border border-dashed mb-9 p-6">
+					<!--begin::Icon-->
+					<i class="ki-duotone ki-information fs-2tx text-warning me-4">
+						<span class="path1"></span>
+						<span class="path2"></span>
+						<span class="path3"></span>
+					</i>
+					<!--end::Icon-->
+					<!--begin::Wrapper-->
+					<div class="d-flex flex-stack flex-grow-1">
+						<!--begin::Content-->
+						<div class="fw-semibold">
+							<h4 class="text-gray-900 fw-bold">You Are Deactivating Your Account</h4>
+							<div class="fs-6 text-gray-700">
+								For extra security, this requires you to confirm your email or phone number when you reset yousignr password.
+								<br />
+								<a class="fw-bold" href="#">Learn more</a>
+							</div>
+						</div>
+						<!--end::Content-->
+					</div>
+					<!--end::Wrapper-->
+				</div>
+				<!--end::Notice-->
+				<!--begin::Form input row-->
+				<div class="form-check form-check-solid fv-row">
+					<input name="deactivate" class="form-check-input" type="checkbox" value="" id="deactivate" />
+					<label class="form-check-label fw-semibold ps-2 fs-6" for="deactivate">I confirm my account deactivation</label>
+				</div>
+				<!--end::Form input row-->
+			</div>
+			<!--end::Card body-->
+			<!--begin::Card footer-->
+			<div class="card-footer d-flex justify-content-end py-6 px-9">
+				<button id="kt_account_deactivate_account_submit" type="submit" class="btn btn-danger fw-semibold">Deactivate Account</button>
+			</div>
+			<!--end::Card footer-->
+		</form>
+		<!--end::Form-->
+	</div>
+	<!--end::Content-->
+</div>
+<!--end::Deactivate Account-->
+*@
+

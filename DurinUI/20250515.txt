@@ -1,0 +1,6 @@
+15.05.2025 22:34:10: LoginError | bbb@bb.com | 1234 | Email or Password is wrong!
+15.05.2025 22:34:16: LoginSucceess | bea@durinls.com | ::1 | Doctor Login Success!
+15.05.2025 22:34:26: LoginError | samplepatient@durinls.com | 12345678 | Email or Password is wrong!
+15.05.2025 22:34:31: LoginSucceess | sampledoctor@durinls.com | ::1 | Patient Login Success!
+15.05.2025 22:36:06: LoginSucceess | sampledoctor@durinls.com | ::1 | User Login Success!
+15.05.2025 22:36:33: LoginSucceess | sampledoctor@durinls.com | ::1 | User Login Success!

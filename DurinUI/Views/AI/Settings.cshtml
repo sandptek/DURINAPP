@@ -1,0 +1,397 @@
+﻿@{
+    ViewData["Title"] = "AI Settings";
+}
+@section Scripts {
+    <script>
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'AISettings', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.active = false;
+                values.status = 3;
+                values.testCSV = false;
+                values.trainCSV = false;
+
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'AISettings', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'AISettings', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                var values = {};
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+                values.deleted = 1;
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'AISettings', keys: key, values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: true,
+                allowDeleting: false,
+                allowAdding: true,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "environment",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { value: 0,  display: "R&D" },
+                            { value: 1,  display: "LAB" }
+                        ],
+                        displayExpr: 'display',
+                        valueExpr: 'value'
+                    },
+                    groupIndex: 1
+                },
+                {
+                    dataField: "type",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { value: 0,  display: "AD" },
+                            { value: 1,  display: "PD" }
+                        ],
+                        displayExpr: 'display',
+                        valueExpr: 'value'
+                    },
+                    groupIndex: 2
+                },
+                {
+                    dataField: "createdDate",
+                    dataType: "datetime",
+                    sortOrder: 'desc',
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    }
+                },
+                {
+                    dataField: "updatedDate",
+                    dataType: "datetime",
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    }
+                },
+                {
+                    dataField: "threshold",
+                    dataType: "number",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "ntree",
+                    dataType: "number",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "mtry",
+                    dataType: "number",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "kfold",
+                    dataType: "number",
+                    validationRules: [{ type: "required" }],
+                    formItem: {
+                        editorOptions: {
+                                placeholder: "If you want to train without K value, enter K=0."  // Silik, pasif yazı
+                        }
+                    }
+                },
+                {
+                    dataField: "status",
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    },
+                    lookup: {
+                        dataSource: [
+                            { value: 0,  display: "Training" },
+                            { value: 1,  display: "Training Complete" },
+                            { value: 2,  display: "Training Error" },
+                            { value: 3,  display: "Wait For Training" }
+                        ],
+                        displayExpr: 'display',
+                        valueExpr: 'value'
+                    }
+                },
+                {
+                    dataField: "active",
+                    dataType: "boolean",
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    }
+                },
+                {
+                    caption: "Train CSV",
+                    width: 125,
+                    allowFiltering: false,
+                    allowSorting: false,
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    },
+                    cellTemplate: (container, options) => {
+                        let btnGroup = document.createElement("div");
+                        btnGroup.setAttribute("class", "btn-group btn-group-sm");
+                        btnGroup.setAttribute("role", "group");
+
+                        let btnTemplate = document.createElement("a");
+                        btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+                        if (options.data == null || options.data.trainCSV == null || options.data.trainCSV == false) {
+                            btnTemplate.setAttribute("class", "btn btn-danger");
+                        }
+                        else {
+                            btnTemplate.setAttribute("class", "btn btn-success");
+                            btnTemplate.setAttribute("href", `/MLEduFiles/${options.data.environment}/${options.data.type}/${options.data.id}/data/train.csv`);
+                            btnTemplate.setAttribute("target", "_blank");
+                        }
+                        btnGroup.append(btnTemplate);
+
+                        let btnUpload = document.createElement("button");
+                        btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+                        btnUpload.setAttribute("class", "btn btn-secondary");
+                        btnUpload.setAttribute("target", "_blank");
+                        btnUpload.onclick = function () {
+                            var fileDialog = $('<input type="file" accept=".csv">');
+                            fileDialog.click();
+                            fileDialog.on("change", function () {
+                                var file = $(this)[0].files[0];
+
+                                if (!file) {
+                                    $('#result').text("No media.");
+                                    return;
+                                }
+
+                                var formData = new FormData();
+                                formData.append("file", file);
+                                formData.append("type", "train");
+                                formData.append("id", options.data.id);
+                                Swal.showLoading();
+                                $.ajax({
+                                    url: "/AI/UploadCSV?handler=Upload",
+                                    type: "POST",
+                                    processData: false,
+                                    contentType: false,
+                                    data: formData,
+                                    success: function (response) {
+                                        Swal.close();
+                                        DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                                        $('#dgTable').dxDataGrid("instance").refresh();
+                                    },
+                                    error: function (error) {
+                                        Swal.close();
+                                        DevExpress.ui.notify(error, "error", 5000);
+                                    }
+                                });
+                            });
+                        };
+                        btnGroup.append(btnUpload);
+
+                        container.append(btnGroup);
+                    }
+                },
+                {
+                    caption: "Test CSV",
+                    width: 170,
+                    allowFiltering: false,
+                    allowSorting: false,
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    },
+                    cellTemplate: (container, options) => {
+                        let btnGroup = document.createElement("div");
+                        btnGroup.setAttribute("class", "btn-group btn-group-sm");
+                        btnGroup.setAttribute("role", "group");
+
+                        let btnTemplate = document.createElement("a");
+                        btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+                        if (options.data == null || options.data.testCSV == null || options.data.testCSV == false) {
+                            btnTemplate.setAttribute("class", "btn btn-danger");
+                        }
+                        else {
+                            btnTemplate.setAttribute("class", "btn btn-success");
+                            btnTemplate.setAttribute("href", `/MLEduFiles/${options.data.environment}/${options.data.type}/${options.data.id}/data/test.csv`);
+                            btnTemplate.setAttribute("target", "_blank");
+                        }
+                        btnGroup.append(btnTemplate);
+
+                        let btnUpload = document.createElement("button");
+                        btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+                        btnUpload.setAttribute("class", "btn btn-secondary");
+                        btnUpload.setAttribute("target", "_blank");
+                        btnUpload.onclick = function () {
+                            var fileDialog = $('<input type="file" accept=".csv">');
+                            fileDialog.click();
+                            fileDialog.on("change", function () {
+                                var file = $(this)[0].files[0];
+
+                                if (!file) {
+                                    $('#result').text("No media.");
+                                    return;
+                                }
+
+                                var formData = new FormData();
+                                formData.append("file", file);
+                                formData.append("type", "test");
+                                formData.append("id", options.data.id);
+                                Swal.showLoading();
+                                $.ajax({
+                                    url: "/AI/UploadCSV?handler=Upload",
+                                    type: "POST",
+                                    processData: false,
+                                    contentType: false,
+                                    data: formData,
+                                    success: function (response) {
+                                        Swal.close();
+                                        DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                                        $('#dgTable').dxDataGrid("instance").refresh();
+                                    },
+                                    error: function (error) {
+                                        Swal.close();
+                                        DevExpress.ui.notify(error, "error", 5000);
+                                    }
+                                });
+                            });
+                        };
+                        btnGroup.append(btnUpload);
+
+                        container.append(btnGroup);
+                    }
+                }, 
+                {
+                    type: "buttons",
+                    buttons: [{
+                        icon: "fa fa-microchip",
+                        //visible: function (e) { return (e.row.data.status == 3 ? true : false); },
+                        onClick: function (e) {
+                            Swal.showLoading();
+                            Sotec.GetData({ url: "/AI/TrainAI", data: { id: e.row.data.id } }, function (ret) {
+                                $('#dgTable').dxDataGrid("instance").refresh();
+                                Swal.close();
+                                DevExpress.ui.notify("AI Train succesfully.", "success", 5000);
+                            }, function (ret) {
+                                Swal.close();
+                                Swal.fire({
+                                    text: ret.responseText,
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonColor: "#00adb5",
+                                    confirmButtonText: "Try Again",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+                                d.resolve();
+                            });
+                        }
+                    },
+                    {
+                        icon: "fa fa-arrow-circle-down",
+                        hint: "Test AD Output",
+                        //visible: function (e) { return (e.row.data.status == 3 ? true : false); },
+                        onClick: function (e) {
+                            window.open(`/MLEduFiles/${e.row.data.environment}/${e.row.data.type}/${e.row.data.id}/output/test_AD_output.csv`, '_blank');
+                        }
+                    },
+                    {
+                        icon: "fa fa-arrow-circle-down",
+                        hint: "Train Output",
+                        //visible: function (e) { return (e.row.data.status == 3 ? true : false); },
+                        onClick: function (e) {
+                            window.open(`/MLEduFiles/${e.row.data.environment}/${e.row.data.type}/${e.row.data.id}/output/train_output.txt`, '_blank');
+                        }
+                    }, "edit", "delete"]
+                }
+            ]
+        }).dxDataGrid('instance');
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>

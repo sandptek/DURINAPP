@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Settings";
+}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <h3>FedEx Settings</h3>
+                <form class="form" action="/Settings/SetFedEx" method="POST" autocomplete="off" enctype="multipart/form-data">
+                    <div class="row mb-10">
+                        <div class="col-md-12">
+                            <label for="" class="form-label">Account Number</label>
+                            <input class="form-control" placeholder="Account Number" name="accountNumber" type="text" value="@DAL.AppConfig.settings.fedEx.accountNumber">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Person Name</label>
+                            <input class="form-control" placeholder="Person Name" name="personName" type="text" value="@DAL.AppConfig.settings.fedEx.personName">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Person Number</label>
+                            <input class="form-control" placeholder="Person Number" name="personNumber" type="text" value="@DAL.AppConfig.settings.fedEx.personNumber">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Street Lines</label>
+                            <input class="form-control" placeholder="Street Lines" name="streetLines" type="text" value="@DAL.AppConfig.settings.fedEx.streetLines">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">City</label>
+                            <input class="form-control" placeholder="City" name="city" type="text" value="@DAL.AppConfig.settings.fedEx.city">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">State</label>
+                            <input class="form-control" placeholder="State" name="stateOrProvinceCode" type="text" value="@DAL.AppConfig.settings.fedEx.stateOrProvinceCode">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">Country</label>
+                            <input class="form-control" placeholder="Country" name="countryCode" type="text" value="@DAL.AppConfig.settings.fedEx.countryCode">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">ZIP Code</label>
+                            <input class="form-control" placeholder="ZIP Code" name="postalCode" type="text" value="@DAL.AppConfig.settings.fedEx.postalCode">
+                        </div>
+                        @* <div class="col-md-6">
+                            <label for="" class="form-label">Zip Code</label>
+                            <input class="form-control" placeholder="Zip Code" name="zipcode" type="text" value="@DAL.AppConfig.settings.fedEx.residential">
+                        </div> *@
+                    </div>
+                    <div class="row text-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

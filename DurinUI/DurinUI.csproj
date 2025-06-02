@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\css\**" />
+    <Compile Remove="wwwroot\devextreme\**" />
+    <Compile Remove="wwwroot\FedEx\**" />
+    <Compile Remove="wwwroot\js\**" />
+    <Compile Remove="wwwroot\lib\**" />
+    <Compile Remove="wwwroot\log\**" />
+    <Compile Remove="wwwroot\media\**" />
+    <Compile Remove="wwwroot\metronic\**" />
+    <Compile Remove="wwwroot\mlReports\**" />
+    <Compile Remove="wwwroot\plateMaps\**" />
+    <Content Remove="wwwroot\css\**" />
+    <Content Remove="wwwroot\devextreme\**" />
+    <Content Remove="wwwroot\FedEx\**" />
+    <Content Remove="wwwroot\js\**" />
+    <Content Remove="wwwroot\lib\**" />
+    <Content Remove="wwwroot\log\**" />
+    <Content Remove="wwwroot\media\**" />
+    <Content Remove="wwwroot\metronic\**" />
+    <Content Remove="wwwroot\mlReports\**" />
+    <Content Remove="wwwroot\plateMaps\**" />
+    <EmbeddedResource Remove="wwwroot\css\**" />
+    <EmbeddedResource Remove="wwwroot\devextreme\**" />
+    <EmbeddedResource Remove="wwwroot\FedEx\**" />
+    <EmbeddedResource Remove="wwwroot\js\**" />
+    <EmbeddedResource Remove="wwwroot\lib\**" />
+    <EmbeddedResource Remove="wwwroot\log\**" />
+    <EmbeddedResource Remove="wwwroot\media\**" />
+    <EmbeddedResource Remove="wwwroot\metronic\**" />
+    <EmbeddedResource Remove="wwwroot\mlReports\**" />
+    <EmbeddedResource Remove="wwwroot\plateMaps\**" />
+    <None Remove="wwwroot\css\**" />
+    <None Remove="wwwroot\devextreme\**" />
+    <None Remove="wwwroot\FedEx\**" />
+    <None Remove="wwwroot\js\**" />
+    <None Remove="wwwroot\lib\**" />
+    <None Remove="wwwroot\log\**" />
+    <None Remove="wwwroot\media\**" />
+    <None Remove="wwwroot\metronic\**" />
+    <None Remove="wwwroot\mlReports\**" />
+    <None Remove="wwwroot\plateMaps\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.10" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BL\BL.csproj" />
+    <ProjectReference Include="..\Core\Entities.csproj" />
+    <ProjectReference Include="..\DAL\DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\User\Data\" />
+    <Folder Include="Areas\User\Models\" />
+    <Folder Include="wwwroot\mnfForms\" />
+    <Folder Include="wwwroot\MLEduFiles\" />
+  </ItemGroup>
+
+</Project>

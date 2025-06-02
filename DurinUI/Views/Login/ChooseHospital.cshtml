@@ -1,0 +1,228 @@
+﻿@model IEnumerable<Entities.DB.Hospital>
+@{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base href="../../../" />
+	<title>DurinLS Choose Affiliation</title>
+	<meta charset="utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta property="og:locale" content="en_US" />
+	<link rel="shortcut icon" href="/metronic//metronic/assets/media/logos/favicon.ico" />
+	<!--begin::Fonts(mandatory for all pages)-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+	<!--end::Fonts-->
+	<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+	<link href="/metronic/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+	<link href="/metronic/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	<!--end::Global Stylesheets Bundle-->
+	<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
+</head>
+<!--begin::Body-->
+<body id="kt_body" class="app-blank bgi-size-cover bgi-attachment-fixed bgi-position-center">
+	<!--begin::Theme mode setup on page load-->
+	<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if ( localStorage.getItem("data-bs-theme") !== null ) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }</script>
+	<!--end::Theme mode setup on page load-->
+	<!--begin::Root-->
+	<div class="d-flex flex-column flex-root" id="kt_app_root">
+		<!--begin::Page bg image-->
+		<style>
+			body {
+				background-image: url('/metronic/assets/media/auth/bg10.jpeg');
+			}
+
+			[data-bs-theme="dark"] body {
+				background-image: url('/metronic/assets/media/auth/bg10-dark.jpeg');
+			}</style>
+		<!--end::Page bg image-->
+		<!--begin::Authentication - Password reset -->
+		<div class="d-flex flex-column flex-lg-row flex-column-fluid">
+			<!--begin::Aside-->
+			<div class="d-flex flex-column flex-center pb-0 pb-lg-10 p-10 w-100">
+				<!--begin::Image-->
+				<img class="theme-light-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20" src="/media/logo_trans.png" alt="" />
+				<img class="theme-dark-show mx-auto mw-100 w-150px w-lg-300px mb-10 mb-lg-20" src="/media/logo_trans.png" alt="" />
+				<!--end::Image-->
+				<!--begin::Title-->
+				<h1 class="text-gray-800 fs-2qx fw-bold text-center mb-7">The leader in early disease detection</h1>
+				<!--end::Title-->
+				<!--begin::Text-->
+				<div class="text-gray-600 fs-base text-center fw-semibold">
+					Start your journey to a diagnosis with Duritect &#8482;
+				</div>
+				<!--end::Text-->
+			</div>
+			<!--begin::Aside-->
+			<!--begin::Body-->
+			<div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12">
+				<!--begin::Wrapper-->
+				<div class="bg-body d-flex flex-column flex-center rounded-4 w-md-600px p-10">
+					<!--begin::Content-->
+					<div class="d-flex flex-center flex-column align-items-stretch h-lg-100 w-md-400px">
+						<!--begin::Wrapper-->
+						<div class="d-flex flex-center flex-column flex-column-fluid pb-15 pb-lg-20">
+							<!--begin::Form-->
+							<form class="form w-100" novalidate="novalidate" id="kt_password_reset_form" data-kt-redirect-url="/Login/Index" action="#">
+								<!--begin::Heading-->
+								<div class="text-center mb-10">
+									<!--begin::Title-->
+									<h1 class="text-gray-900 fw-bolder mb-3">
+										Confirm Your Affiliation
+									</h1>
+									<!--end::Title-->
+									<!--begin::Link-->
+									<div class="text-gray-500 fw-semibold fs-6">Need to add or update your affiliation, email us at: <a href="mailto:contactus@durinlifesciences.com">contactus@durinlifesciences.com</a></div>
+									<!--end::Link-->
+								</div>
+								<!--begin::Heading-->
+								<!--begin::Input group=-->
+								<div class="fv-row mb-8">
+									<div class="fv-row">
+										<!--begin::Row-->
+										<div class="row">
+											@foreach (var item in Model)
+											{
+												<div class="col-lg-12">
+													<!--begin::Option-->
+													<input type="radio" class="btn-check" name="hospital" value="@item.id" id="rd_hospital_@item.id"/>
+													<label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-7 d-flex align-items-center mb-10" for="rd_hospital_@item.id">
+														
+														<!--begin::Info-->
+														<span class="d-block fw-semibold text-start">
+															<span class="text-gray-900 fw-bold d-block fs-4 mb-2"><i class="bi bi-h-circle-fill"></i> @item.name</span>
+															@*<span class="text-muted fw-semibold fs-6">@item.officalName</span>*@
+														</span>
+														<!--end::Info-->
+													</label>
+													<!--end::Option-->
+												</div>
+											}
+										</div>
+										<!--end::Row-->
+									</div>
+								</div>
+								<!--begin::Actions-->
+								<div class="d-flex flex-wrap justify-content-center pb-lg-0">
+									<button type="button" id="kt_password_reset_submit" class="btn btn-primary me-4">
+										<!--begin::Indicator label-->
+										<span class="indicator-label">Choose</span>
+										<!--end::Indicator label-->
+										<!--begin::Indicator progress-->
+										<span class="indicator-progress">
+											Please wait...
+											<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+										</span>
+										<!--end::Indicator progress-->
+									</button>
+									<a href="/Login/SignOut" class="btn btn-light">Cancel</a>
+								</div>
+								<!--end::Actions-->
+							</form>
+							<!--end::Form-->
+						</div>
+						<!--end::Wrapper-->
+					</div>
+					<!--end::Content-->
+				</div>
+				<!--end::Wrapper-->
+			</div>
+			<!--end::Body-->
+		</div>
+		<!--end::Authentication - Password reset-->
+	</div>
+	<!--end::Root-->
+	<!--begin::Javascript-->
+	<script>var hostUrl = "/metronic/assets/";</script>
+	<!--begin::Global Javascript Bundle(mandatory for all pages)-->
+	<script src="/metronic/assets/plugins/global/plugins.bundle.js"></script>
+	<script src="/metronic/assets/js/scripts.bundle.js"></script>
+	<script type="text/javascript" src="/sotec.js"></script>
+	<!--end::Global Javascript Bundle-->
+	<!--begin::Custom Javascript(used for this page only)-->
+	<script>
+		"use strict";
+
+		// Class Definition
+		var KTAuthResetPassword = function() {
+			// Elements
+			var form;
+			var submitButton;
+
+			var handleForm = function(e) {
+				submitButton.addEventListener('click', function (e) {
+					e.preventDefault();
+
+					submitButton.setAttribute('data-kt-indicator', 'on');
+					submitButton.disabled = true;
+
+					const selectedHospital = form.querySelector('[name="hospital"]:checked');
+					if (selectedHospital) {
+						Sotec.GetData(
+							{ url: "/Login/SelectHospital", method: "POST", data: { hospitalID: selectedHospital.value } },
+							function (ret) {
+								submitButton.removeAttribute('data-kt-indicator');
+								submitButton.disabled = false;
+								location.href = "/User/Home/Index";
+							},
+							function (ret) {
+								submitButton.removeAttribute('data-kt-indicator');
+								submitButton.disabled = false;
+
+								Swal.fire({
+									text: ret.responseText,
+									icon: "error",
+									buttonsStyling: false,
+									confirmButtonColor: "#00adb5",
+									confirmButtonText: "Try Again",
+									customClass: {
+										confirmButton: "btn btn-primary"
+									}
+								});
+							}
+						);
+					} else {
+						submitButton.removeAttribute('data-kt-indicator');
+						submitButton.disabled = false;
+
+						Swal.fire({
+							text: "Please choose a Affiliation.",
+							icon: "error",
+							buttonsStyling: false,
+							confirmButtonColor: "#00adb5",
+							confirmButtonText: "Try Again",
+							customClass: {
+								confirmButton: "btn btn-primary"
+							}
+						});
+					}
+					
+				});
+			}
+
+			// Public Functions
+			return {
+				// public functions
+				init: function() {
+					form = document.querySelector('#kt_password_reset_form');
+					submitButton = document.querySelector('#kt_password_reset_submit');
+
+					handleForm();
+				}
+			};
+		}();
+
+		// On document ready
+		KTUtil.onDOMContentLoaded(function() {
+			KTAuthResetPassword.init();
+		});
+
+	</script>
+	<!--end::Custom Javascript-->
+	<!--end::Javascript-->
+</body>
+<!--end::Body-->
+</html>

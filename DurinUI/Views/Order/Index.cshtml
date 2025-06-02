@@ -1,0 +1,1558 @@
+﻿@{
+    ViewData["Title"] = "Orders";
+}
+@section Scripts {
+    <script src="https://www.paypal.com/sdk/js?client-id=Ae9oOYHi3BGb_pHLejcbe0U0EDcHb5ATO3y32Ow4LiUwUwOnV1hI1dgmJdRKCjWTJaK9wGuFDIWHaMuy" data-sdk-integration-source="integrationbuilder_sc"></script>
+    <script>
+        const userType = "@(User.IsInRole("admin") ? "admin" : (User.IsInRole("doctor") ? "doctor" : (User.IsInRole("patient") ? "patient" : (User.IsInRole("labDoctor") ? "labDoctor" : (User.IsInRole("labUser") ? "labUser" : (User.IsInRole("controlUser") ? "controlUser" : (User.IsInRole("durinDoctor") ? "durinDoctor" : "")))))))";
+
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+
+                var keys = { deleted: 0 };
+                if (userType == "labUser") {
+                    keys.status = [5, 6, 7, 8, 9, 10];
+                }
+                else if (userType == "labDoctor") {
+                    keys.status = [12];
+                }
+                else if (userType == "durinDoctor") {
+                    keys.status = [18];
+                }
+
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Orders', keys: keys },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'Orders', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Orders', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                var values = {};
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+                values.deleted = 1;
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Orders', keys: key, values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var storeDoctor = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storePatient = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storeProduct = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Products', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Products', keys: { deleted: 0, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storeItems = new DevExpress.data.CustomStore({
+            key: "id",
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+
+                Sotec.GetData({ url: "/Order/GetOrderItems", data: { } }, function (ret) {
+                    d.resolve(ret, { totalCount: ret.length });
+                }, function (ret) {
+                    DevExpress.ui.notify(ret, "error", 5000);
+                    d.resolve();
+                });
+                return d.promise();
+            }
+        });
+        var storeHospital = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Hospitals', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Hospitals', keys: { deleted: 0, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            toolbar: {
+                items: [
+                    {
+                        widget: 'dxButton',
+                        options: {
+                            text: 'Download Luminex Plate Map',
+                            icon: 'download',
+                            onClick(e) {
+                                $('#dgDownloadCSV').dxDataGrid({
+                                    dataSource: storeItems,
+                                    keyExpr: "id",
+                                    selection: {
+                                        mode: "multiple", // Çoklu seçim
+                                        showCheckBoxesMode: "always", // Checkbox'lar her zaman görünsün
+                                    },
+                                    toolbar: {
+                                        items: [
+                                            {
+                                                widget: 'dxButton',
+                                                options: {
+                                                    text: 'Download CSV',
+                                                    icon: 'download',
+                                                    onClick(e) {
+                                                        // DataGrid nesnesine erişim
+                                                        const dataGrid = $("#dgDownloadCSV").dxDataGrid("instance");
+                                                        // Seçili satırların ID'lerini al
+                                                        const selectedIds = dataGrid.getSelectedRowKeys();
+                                                        if (selectedIds.length <= 0) {
+                                                            DevExpress.ui.notify("Please select items.", "error", 5000);
+                                                        }
+                                                        else if (selectedIds.length > 36) {
+                                                            DevExpress.ui.notify("You can select maximum 36 items.", "error", 5000);
+                                                        }
+                                                        else {
+                                                            Swal.showLoading();
+
+
+                                                            $.ajax({
+                                                                url: '/Order/GetCSV1',  // CSV'yi döndüren Action URL
+                                                                type: 'POST',
+                                                                data: { selectedItems: selectedIds },// POST isteği
+                                                                xhrFields: {
+                                                                    responseType: 'blob'   // Yanıt tipi blob olacak
+                                                                },
+                                                                success: function(response) {
+                                                                Swal.close();
+                                                                    // CSV dosyasını indir
+                                                                    var link = document.createElement('a');
+                                                                    link.href = window.URL.createObjectURL(response);
+                                                                    link.download = "LPM_CSV.csv";  // İndirilecek dosya adı
+                                                                    link.click();                // Linki tıkla ve indir
+                                                                },
+                                                                error: function(xhr, status, error) {
+                                                                    alert("Something went wrong: " + error);
+                                                                }
+                                                            });
+                                                            /*$.ajax({
+                                                                url: '/Order/GetCSV2',  // CSV'yi döndüren Action URL
+                                                                type: 'POST',
+                                                                data: { selectedItems: selectedIds },// POST isteği
+                                                                xhrFields: {
+                                                                    responseType: 'blob'   // Yanıt tipi blob olacak
+                                                                },
+                                                                success: function(response) {
+                                                                Swal.close();
+                                                                    // CSV dosyasını indir
+                                                                    var link = document.createElement('a');
+                                                                    link.href = window.URL.createObjectURL(response);
+                                                                    link.download = "KAPPA Plate map.csv";  // İndirilecek dosya adı
+                                                                    link.click();                // Linki tıkla ve indir
+                                                                },
+                                                                error: function(xhr, status, error) {
+                                                                    alert("Bir hata oluştu: " + error);
+                                                                }
+                                                            });*/
+                                                            $.ajax({
+                                                                url: '/Order/GetXLSX',  // CSV'yi döndüren Action URL
+                                                                type: 'POST',
+                                                                data: { selectedItems: selectedIds },// POST isteği
+                                                                xhrFields: {
+                                                                    responseType: 'blob'   // Yanıt tipi blob olacak
+                                                                },
+                                                                success: function(response) {
+                                                                Swal.close();
+                                                                    // CSV dosyasını indir
+                                                                    var link = document.createElement('a');
+                                                                    link.href = window.URL.createObjectURL(response);
+                                                                    link.download = "Plate map.xlsx";  // İndirilecek dosya adı
+                                                                    link.click();                // Linki tıkla ve indir
+                                                                },
+                                                                error: function(xhr, status, error) {
+                                                                    alert("Something went wrong: " + error);
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    columnsAutoWidth: true,
+                                    showBorders: true,
+                                    showRowLines: true,
+                                    showColumnHeaders: true,
+                                    rowAlternationEnable: true,
+                                    paging: {
+                                        pageSize: 30,
+                                    },
+                                    loadPanel: {
+                                        enabled: true
+                                        },
+                                    columns: [{
+                                            caption: "Receipt Number",
+                                            allowEditing: false,
+                                            formItem: {
+                                                visible: false // Edit formda gözükmez
+                                            },
+                                            calculateCellValue: function (rowData) {
+                                                return Sotec.toMixedNumber(rowData.order.id); // Hesaplama
+                                            },
+                                        },
+                                        {
+                                            caption: "Lab ID",
+                                            allowEditing: false,
+                                            formItem: {
+                                                visible: false // Edit formda gözükmez
+                                            },
+                                            calculateCellValue: function (rowData) {
+                                                return Sotec.toMixedNumber(rowData.id); // Hesaplama
+                                            },
+                                        },
+                                        {
+                                            dataField: "product.name",
+                                            caption: "Product",
+                                        }
+                                    ],
+                                }).dxDataGrid('instance');
+                                $('#kt_modal_csv_download').modal('show');
+                            }
+                        }
+                    },
+                    {
+                        widget: 'dxButton',
+                        options: {
+                            text: 'Upload Test Request Files',
+                            icon: 'upload',
+                            onClick(e) {
+                                var fileDialog = $('<input type="file" accept=".csv" multiple>');
+                                fileDialog.click();
+                                fileDialog.on("change",onFileSelected);
+                                return false;
+                            }
+                        }
+                    },
+                    'addRowButton'
+                ]
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: true,
+                allowDeleting: @(User.IsInRole("admin") ? "true" : "false"),
+                allowAdding: @(User.IsInRole("admin") || User.IsInRole("controlUser") ? "true" : "false"),
+                useIcons: true,
+                form: {
+                    items: [{
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 2,
+                        items: [
+                            {
+                                itemType: 'group',
+                                caption: "Info",
+                                colCount: 2,
+                                colSpan: 2,
+                                items:
+                                    (userType == "labUser" || userType == "labDoctor" ? ["status", {
+                                        dataField: 'statusDescription',
+                                        editorType: 'dxTextArea',
+                                        colSpan: 2,
+                                        editorOptions: {
+                                            height: 100,
+                                        },
+                                    }] : ["doctorid", "hospitalid", "patientid"
+                                    , "status", {
+                                        dataField: 'statusDescription',
+                                        editorType: 'dxTextArea',
+                                        colSpan: 2,
+                                        editorOptions: {
+                                            height: 100,
+                                        },
+                                    }])
+                                ,
+                            },
+                            {
+                                itemType: 'group',
+                                caption: "Shipping",
+                                colCount: 2,
+                                colSpan: 2,
+                                items: ["carrier", "shippingNumber"],
+                            },
+                            {
+                                itemType: 'group',
+                                caption: "Descriptions",
+                                colCount: 1,
+                                colSpan: 2,
+                                items: [{
+                                    dataField: 'description1',
+                                    editorType: 'dxTextArea',
+                                    colSpan: 2,
+                                    editorOptions: {
+                                        height: 100,
+                                    },
+                                }, {
+                                    dataField: 'description2',
+                                    editorType: 'dxTextArea',
+                                    colSpan: 2,
+                                    editorOptions: {
+                                        height: 100,
+                                    },
+                                }],
+                            },
+                        ],
+                    }],
+                }
+            },
+            columns: [
+                {
+                    caption: "Receipt Number",
+                    allowEditing: false,
+                    formItem: {
+                        visible: false // Edit formda gözükmez
+                    },
+                    calculateCellValue: function (rowData) {
+                        return Sotec.toMixedNumber(rowData.id); // Hesaplama
+                    },
+                    visible: (userType == "doctor" || userType == "admin" ? true : false),
+                    cellTemplate: cellPrintBarcodeTemplate
+                },
+                {
+                    dataField: "doctorid",
+                    caption: "Doctor",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storeDoctor,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: 'email'
+                    },
+                    visible: (userType == "labUser" || userType == "labDoctor" ? false : true),
+                    allowEditing: (userType == "labUser" || userType == "labDoctor" ? false : true)
+                },
+                {
+                    dataField: "hospitalid",
+                    caption: "Affiliation",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storeHospital,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: 'name'
+                    },
+                    visible: true,
+                    allowEditing: true
+                }, {
+                    dataField: "patientid",
+                    caption: "Patient",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storePatient,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: 'email'
+                    },
+                    visible: (userType == "labUser" || userType == "labDoctor" ? false : true),
+                    allowEditing: (userType == "labUser" || userType == "labDoctor" ? false : true)
+                }, {
+                    dataField: "description1"
+                    
+                }, {
+                    dataField: "description2",
+                    visible: false
+                }, {
+                    dataField: "carrier",
+                    visible: (userType == "labDoctor" || userType == "durinDoctor" ? false : true)
+                }, {
+                    dataField: "shippingNumber",
+                    visible: (userType == "labDoctor" || userType == "durinDoctor" ? false : true)
+                }, {
+                    dataField: "status",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { status: 0,  value: "Draft",              disabled: !(userType == "admin" || userType == "controlUser") },
+                            { status: 1,  value: "Preparing",          disabled: !(userType == "admin" || userType == "controlUser") },
+                            { status: 2,  value: "Waiting",            disabled: !(userType == "admin" || userType == "controlUser") },
+                            { status: 3,  value: "Paid",               disabled: !(userType == "admin" || userType == "controlUser") },
+                            { status: 4,  value: "Wait For Shipping",  disabled: !(userType == "admin" || userType == "controlUser") },
+                            { status: 5,  value: "Shipped",            disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser") },
+                            { status: 6,  value: "In Transit",         disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser" ) },
+                            { status: 7,  value: "Delivered",          disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser" ) },
+                            { status: 8,  value: "Quality Control",    disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser" ) },
+                            { status: 9,  value: "In Process",         disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser") },
+                            { status: 10, value: "Lab Test Completed", disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser") },
+                            { status: 11, value: "MLA Start",          disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser") },
+                            { status: 12, value: "MD Control",         disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser") },
+                            { status: 18, value: "Durin MD Control",   disabled: !(userType == "admin" || userType == "controlUser" || userType == "labDoctor") },
+                            { status: 13, value: "Done",               disabled: !(userType == "admin" || userType == "durinDoctor") },
+                            { status: 17, value: "Indeterminate",      disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser" || userType == "durinDoctor") },
+                            { status: 14, value: "Failed",             disabled: !(userType == "admin" || userType == "controlUser" || userType == "durinDoctor") },
+                            { status: 15, value: "Cancelled",          disabled: !(userType == "admin" || userType == "controlUser" || userType == "durinDoctor") },
+                            { status: 16, value: "Any Problem",        disabled: !(userType == "admin" || userType == "controlUser" || userType == "labUser" || userType == "durinDoctor") }
+                        ],
+                        displayExpr: 'value',
+                        valueExpr: 'status'
+                    },
+                    setCellValue(rowData, value, currentRowData) {
+                        if (value == 0) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+                        } else if (value == 1) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 2) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 3) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 4) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 5) {
+                            if (userType == "admin" || userType == "doctor" || userType == "controlUser" || userType == "labUser") {
+                                if (currentRowData.carrier == null || currentRowData.carrier.length === 0) {
+                                    DevExpress.ui.notify("You must enter a carrier first!", "error", 5000);
+                                }
+                                else {
+                                    if (currentRowData.shippingNumber == null || currentRowData.shippingNumber.length === 0) {
+                                        DevExpress.ui.notify("You must enter a shipping number first!", "error", 5000);
+                                    }
+                                    else {
+                                        rowData.status = value;
+                                    }
+                                }
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 6) {
+                            if (userType == "admin" || userType == "labUser" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 7) {
+                            if (userType == "admin" || userType == "labUser" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 8) {
+                            if (userType == "admin" || userType == "labUser" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 9) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "labUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 10) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "labUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 11) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "labUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 12) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "labUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 13) {
+                            if (userType == "admin" || userType == "durinDoctor") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 14) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "durinDoctor") {
+                                if (currentRowData.statusDescription == null || currentRowData.statusDescription.length === 0) {
+                                    DevExpress.ui.notify("You must enter a status description first!", "error", 5000);
+                                }
+                                else {
+                                    rowData.status = value;
+                                }
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 15) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "durinDoctor") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 17) {
+                            if (userType == "admin" || userType == "labUser" || userType == "controlUser" || userType == "durinDoctor") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 18) {
+                            if (userType == "admin" || userType == "labDoctor" || userType == "controlUser") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        } else if (value == 16) {
+                            if (userType == "admin" || userType == "controlUser" || userType == "labUser" || userType == "durinDoctor") {
+                                rowData.status = value;
+                            }
+                            else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+
+                        }
+                    }
+                }, {
+                    dataField: "statusDescription",
+                    visible: false
+                }, {
+                    type: "buttons",
+                    buttons: [{
+                        icon: "fa fa-credit-card",
+                        visible: function (e) { return (e.row.data.status == 2 ? true : false); },
+                        onClick: function (e) {
+                            openPaid(e.row.data.id);
+                        }
+                    },
+                    {
+                        icon: "fa fa-truck",
+                        visible: function (e) { return (e.row.data.status == 3 ? true : false); },
+                        onClick: function (e) {
+                            Swal.showLoading();
+                            Sotec.GetData({ url: "/Order/CreateShipment", data: { orderID: e.row.data.id } }, function (ret) {
+                                $('#dgTable').dxDataGrid("instance").refresh();
+                                Swal.close();
+                                DevExpress.ui.notify("Create FedEx shipment succesfully.", "success", 5000);
+                            }, function (ret) {
+                                Swal.close();
+                                Swal.fire({
+                                    text: ret.responseText,
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonColor: "#00adb5",
+                                    confirmButtonText: "Try Again",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+                                d.resolve();
+                            });
+                        }
+                    },
+                    {
+                        icon: "fa fa-print",
+                        visible: function (e) { return (e.row.data.status == 5 ? true : false); },
+                        onClick: function (e) {
+                            window.open(`/FedEx/${e.row.data.id}/${e.row.data.shippingNumber}.png`, '_blank');
+                        }
+                    }, "edit", "delete"]
+                }
+            ],
+            masterDetail: {
+
+                enabled: true,
+                template: function (container, options) {
+                    $('<h2>').text(`#${Sotec.toMixedNumber(options.data.id)} Order Tests:`).appendTo(container);
+
+                    $('<div>').dxDataGrid({
+                        columnsAutoWidth: true,
+                        showBorders: true,
+                        showRowLines: true,
+                        rowAlternationEnable: true,
+                        paging: {
+                            pageSize: 30,
+                        },
+                        loadPanel: {
+                            enabled: true
+                        },
+                        editing: {
+                            mode: "form",
+                            allowUpdating: true,
+                            allowDeleting: @(User.IsInRole("admin") || User.IsInRole("controlUser") || User.IsInRole("doctor") || User.IsInRole("labDoctor") ? "true" : "false"),
+                            allowAdding: true,
+                            useIcons: true,
+                            form: {
+                                items: [{
+                                    itemType: 'group',
+                                    colCount: 2,
+                                    colSpan: 2,
+                                    items: [
+                                        "productid",
+                                        "price",
+                                        {
+                                            dataField: 'description',
+                                            editorType: 'dxTextArea',
+                                            colSpan: 2,
+                                            editorOptions: {
+                                                height: 100,
+                                            },
+                                        }
+                                    ],
+                                }],
+                            }
+                        },
+                        columns: [
+                            {
+                                caption: "Lab ID",
+                                allowEditing: false,
+                                formItem: {
+                                    visible: false // Edit formda gözükmez
+                                },
+                                calculateCellValue: function (rowData) {
+                                    return Sotec.toMixedNumber(rowData.id); // Hesaplama
+                                },
+                                cellTemplate: cellPrintBarcodeTemplate
+                            },
+                            {
+                                dataField: "productid",
+                                caption: "Product",
+                                validationRules: [{ type: "required" }],
+                                lookup: {
+                                    dataSource: {
+                                        store: storeProduct,
+                                        paginate: false
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name'
+                                },
+                                setCellValue(rowData, value) {
+                                    return getPrice(value).done(function (data) {
+                                        rowData.productid = value;
+                                        rowData.price = data[0].price;
+                                    });
+                                },
+                            }, {
+                                dataField: "price",
+                                validationRules: [{ type: "required" }]
+                            }, {
+                                dataField: "description"
+                            },
+                            {
+                                caption: "Medical Necessity Form",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellMNFFormTemplate
+                            },
+                            {
+                                caption: "Patient Consent",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellLISICFormTemplate
+                            },
+                            {
+                                caption: "Test Requisition Form",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellTRFFormTemplate
+                            },
+                            {
+                                caption: "ML Report",
+                                width: 100,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellTestRequestFileTemplate
+                            }
+                        ],
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: ["id"],
+                            errorHandler: function (error) { console.log(error) },
+                            load: function (loadOptions) {
+                                var d = $.Deferred();
+                                Sotec.TableOP(
+                                    { type: 'S', tableName: 'OrderItems', keys: { deleted: 0, orderid: options.data.id } },
+                                    function (ret) {
+                                        d.resolve(ret, { totalCount: ret.length });
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            insert: function (values) {
+                                var d = $.Deferred();
+
+                                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.orderid = options.data.id;
+                                values.quantity = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'I', tableName: 'OrderItems', values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            update: function (key, values) {
+                                var d = $.Deferred();
+
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'OrderItems', values: values, keys: key },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            remove: function (key) {
+                                var d = $.Deferred();
+
+                                var values = {};
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+                                values.deleted = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'OrderItems', keys: key, values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            }
+                        }),
+                    }).appendTo(container);
+                }
+            }
+        }).dxDataGrid('instance');
+
+        function getPrice(id) {
+            var d = $.Deferred();
+            Sotec.TableOP(
+                { type: 'S', tableName: 'Products', keys: { deleted: 0, id: id } },
+                function (ret) {
+                    d.resolve(ret);
+                },
+                function (ret) {
+                    DevExpress.ui.notify(ret, "error", 5000);
+                    d.resolve();
+                }
+            );
+            return d.promise();
+        }
+
+        function cellPrintBarcodeTemplate(container, options) {
+            let fileElement2 = document.createElement("button");
+            fileElement2.innerHTML = "<i class='fa fa-print'></i> " + options.value;
+            fileElement2.setAttribute("onclick", "PrintBarcode(" + options.value + ")");
+            fileElement2.setAttribute("class", "btn btn-link");
+            container.append(fileElement2);
+        }
+
+        function cellTestRequestFileTemplate(container, options) {
+            console.log(options);
+
+            if (options.data == null || options.data.mlPrediction == null || options.data.mlPrediction == "") {
+                let fileElement = document.createElement("p");
+                fileElement.innerHTML = "No Media";
+                container.append(fileElement);
+            }
+            else {
+                let fileElement = document.createElement("a");
+                fileElement.innerHTML = "Download";
+                fileElement.setAttribute("href", "/Order/GetMLReport/" + options.data.id);
+                fileElement.setAttribute("target", "_blank");
+                container.append(fileElement);
+            }
+        }
+
+        function cellMNFFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            /*let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/Order/GetMNFReport/" + options.data.id);
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);*/
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/formTemplates/MNFNew.pdf");
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInput')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.mnf == null || options.data.mnf == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/mnfForms/" + options.data.mnf);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+
+        function cellLISICFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/formTemplates/LISInformedConsent.pdf");
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInputLISIC')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.lisic == null || options.data.lisic == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/lisicForms/" + options.data.lisic);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+
+        function cellTRFFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/formTemplates/DurinTRFForm.pdf");
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInputTRF')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.trf == null || options.data.trf == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/trfForms/" + options.data.trf);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+
+        $('#fileInput').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadMNF?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+
+        $('#fileInputLISIC').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadLISIC?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+
+        $('#fileInputTRF').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadTRF?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+
+        function openPaid(_orderID) {
+            Swal.showLoading();
+
+            Sotec.GetData(
+                { url: "/Order/GetOrderPrice", data: { orderID: _orderID } },
+                function (ret) {
+                    Swal.close();
+
+                    if (ret <= 0) {
+                        Swal.fire({
+                            text: "There are no items.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonColor: "#00adb5",
+                            confirmButtonText: "OK",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                    else {
+                        renderPaypal(_orderID, ret);
+                        $('#kt_modal_create_app').modal('show');
+                    }
+                },
+                function (ret) {
+                    Swal.close();
+                    Swal.fire({
+                        text: ret.responseText,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonColor: "#00adb5",
+                        confirmButtonText: "Try Again",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            );
+
+        }
+
+        function resultMessage(message) {
+            const container = document.querySelector("#result-message");
+            container.innerHTML = message;
+            DevExpress.ui.notify(message, "error", 5000);
+        }
+
+        function renderPaypal(_orderID, _price) {
+            orderID = _orderID;
+            price = _price;
+            document.getElementById('paypal-button-container').innerHTML = '';
+            window.paypal
+                .Buttons({
+                    style: {
+                        shape: "rect",
+                        layout: "vertical",
+                    },
+                    async createOrder(data, actions) {
+                        try {
+                            return actions.order.create({ purchase_units: [{ amount: { value: price } }] });
+                        } catch (error) {
+                            console.error(error);
+                            resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
+                        }
+                    },
+                    async onApprove(data, actions) {
+                        try {
+                            console.log(data);
+                            return actions.order.capture().then(function (orderData) {
+                                const transaction = orderData.purchase_units[0].payments.captures[0];
+                                Sotec.GetData({ url: "/Order/SetOrderPayment", data: { orderID: orderID, transaction: transaction.id } }, function (ret) {
+                                    $('#dgTable').dxDataGrid("instance").refresh();
+                                    DevExpress.ui.notify("Order payment succesfully.", "success", 5000);
+                                });
+                            });
+                        } catch (error) {
+                            console.error(error);
+                            resultMessage(
+                                `Sorry, your transaction could not be processed...<br><br>${error}`,
+                            );
+                        }
+                    },
+                })
+                .render("#paypal-button-container");
+        }
+
+        var onFileSelected = function(e){
+            console.log($(this)[0].files);
+            var files = $(this)[0].files;
+            if (files.length > 0) {
+                var that = this;
+                var formData = new FormData();
+
+                if ($(this)[0].files.length != 2) {
+                    DevExpress.ui.notify("Plese choose 2 csv file.", "error", 5000);
+                }
+                else {
+                    // add assoc key values, this will be posts values
+                    formData.append("csvFile", $(this)[0].files[0], $(this)[0].files[0].name);
+                    formData.append("csvFile", $(this)[0].files[1], $(this)[0].files[1].name);
+                    formData.append("upload_file", true);
+
+                    Swal.showLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: "/Order/UploadTest",
+                        success: function (data) {
+                            console.log(data);
+
+                            if (data.errors.length > 0) {
+                                const dataSource = data.errors.map(item => ({ value: item }));
+                                $('#dgCsvErrors').dxDataGrid({
+                                    dataSource: dataSource,
+                                    columnsAutoWidth: true,
+                                    showBorders: true,
+                                    showRowLines: true,
+                                    showColumnHeaders: false,
+                                    rowAlternationEnable: true,
+                                    toolbar: {
+                                        items: [
+                                            {
+                                                widget: 'dxButton',
+                                                visible: data.canSave,
+                                                options: {
+                                                    text: 'Save Test Data',
+                                                    icon: 'save',
+                                                    onClick(e) {
+                                                        Swal.showLoading();
+                                                        $.ajax({
+                                                            type: "POST",
+                                                            url: "/Order/SaveTest",
+                                                            success: function (data) {
+                                                                $('#kt_modal_csv_errors').modal('hide');
+                                                                DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                                                                Swal.close();
+                                                            },
+                                                            error: function (error) {
+                                                                DevExpress.ui.notify(error, "error", 5000);
+                                                                Swal.close();
+                                                            },
+                                                            async: true,
+                                                            data: formData,
+                                                            cache: false,
+                                                            contentType: false,
+                                                            processData: false,
+                                                            timeout: 600000
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    paging: {
+                                        pageSize: 30,
+                                    },
+                                    loadPanel: {
+                                        enabled: true
+                                        },
+                                    columns: [{
+                                        dataField: "value"
+                                    }],
+                                }).dxDataGrid('instance');
+                                Swal.close();
+                                $('#kt_modal_csv_errors').modal('show');
+                            }
+                            else {
+                                DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                                $('#dgTable').dxDataGrid("instance").refresh();
+                            }
+                        },
+                        error: function (error) {
+                            DevExpress.ui.notify(error, "error", 5000);
+                            Swal.close();
+                        },
+                        async: true,
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        timeout: 600000
+                    });
+                }
+            }
+            else {
+                DevExpress.ui.notify("No file selected.", "error", 5000);
+            }
+        };
+
+        function PrintBarcode(barcode) {
+            Print("/System/PrintBarcode?barcode=" + barcode);
+        }
+
+        function Print(url) {
+            var iframe = this._printIframe;
+            iframe = this._printIframe = document.createElement('iframe');
+            document.body.appendChild(iframe);
+
+            iframe.style.display = 'none';
+            iframe.onload = function () {
+                setTimeout(function () {
+                    iframe.focus();
+                    iframe.contentWindow.print();
+                }, 1);
+            };
+            iframe.src = url;
+        }
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--begin::Modal - Create App-->
+<div class="modal fade" id="kt_modal_create_app" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-800px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2>Order Payment</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body py-lg-10 px-lg-10">
+                <div id="paypal-button-container"></div>
+                <p id="result-message"></p>
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Create App-->
+<!--begin::Modal - Create App-->
+<div class="modal fade" id="kt_modal_csv_errors" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-800px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2>Error!</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-x"></i>
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body py-lg-10 px-lg-10">
+                <div id="dgCsvErrors"></div>
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Create App-->
+<!--begin::Modal - Create App-->
+<div class="modal fade" id="kt_modal_csv_download" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-800px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2>Download CSV</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-x"></i>
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body py-lg-10 px-lg-10">
+                <div id="dgDownloadCSV"></div>
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Create App-->
+<input type="file" id="fileInput" style="display:none;" />
+<input type="file" id="fileInputTRF" style="display:none;" />
+<input type="file" id="fileInputLISIC" style="display:none;" />
+<input type="hidden" id="selectedID" />

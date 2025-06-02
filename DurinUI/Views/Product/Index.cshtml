@@ -1,0 +1,187 @@
+﻿@{
+    ViewData["Title"] = "Products";
+}
+@section Scripts {
+    <script>
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Products', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'Products', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Products', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                var values = {};
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+                values.deleted = 1;
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Products', keys: key, values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: true,
+                allowDeleting: true,
+                allowAdding: true,
+                useIcons: true,
+                form: {
+                    items: [{
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 2,
+                        items: [
+                            "sku",
+                            "name",
+                            "price",
+                            "declaredValue",
+                            "type",
+                            "testType",
+                            {
+                                dataField: 'description1',
+                                editorType: 'dxTextArea',
+                                colSpan: 2,
+                                editorOptions: {
+                                    height: 100,
+                                },
+                            }, {
+                                dataField: 'description2',
+                                editorType: 'dxTextArea',
+                                colSpan: 2,
+                                editorOptions: {
+                                    height: 100,
+                                },
+                            }
+                        ],
+                    }],
+                }
+            },
+            columns: [
+                {
+                    dataField: "sku",
+                    validationRules: [{ type: "required" }]
+                },
+                {
+                    dataField: "name",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "price",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "declaredValue",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "description1"
+                }, {
+                    dataField: "description2"
+                }, {
+                    dataField: "type",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { key: 0, value: "AD" },
+                            { key: 1, value: "PD" }
+                        ],
+                        displayExpr: 'value',
+                        valueExpr: 'key'
+                    }
+                }, {
+                    dataField: "testType",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { key: 0, value: "Paper" },
+                            { key: 1, value: "Cold" }
+                        ],
+                        displayExpr: 'value',
+                        valueExpr: 'key'
+                    }
+                }
+            ]
+        }).dxDataGrid('instance');
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>

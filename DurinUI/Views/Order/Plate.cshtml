@@ -1,0 +1,203 @@
+﻿@{
+    ViewData["Title"] = "Plates";
+}
+@section Scripts {
+    <script>
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Plates', keys: { deleted: 0 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showRowLines: true,
+            rowAlternationEnable: true,
+            paging: {
+                pageSize: 30,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: false,
+                allowDeleting: false,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "id"
+                },
+                {
+                    dataField: "createdDate",
+                    dataType: "datetime",
+                    sortOrder: 'desc'
+                },
+                {
+                    dataField: "updatedDate",
+                    dataType: "datetime"
+                },
+                {
+                    caption: "Antigen",
+                    width: 125,
+                    allowFiltering: false,
+                    allowSorting: false,
+                    cellTemplate: (container, options) => {
+                        let btnGroup = document.createElement("div");
+                        btnGroup.setAttribute("class", "btn-group btn-group-sm");
+                        btnGroup.setAttribute("role", "group");
+
+                        let btnTemplate = document.createElement("a");
+                        btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+                        if (options.data == null || options.data.trainCSV == null || options.data.trainCSV == false) {
+                            btnTemplate.setAttribute("class", "btn btn-danger");
+                        }
+                        else {
+                            btnTemplate.setAttribute("class", "btn btn-success");
+                            btnTemplate.setAttribute("href", `/plateFiles/${options.data.id}/${options.data.antigenFile}`);
+                            btnTemplate.setAttribute("target", "_blank");
+                        }
+                        btnGroup.append(btnTemplate);
+
+                        container.append(btnGroup);
+                    }
+                },
+                {
+                    caption: "Kappa",
+                    width: 170,
+                    allowFiltering: false,
+                    allowSorting: false,
+                    cellTemplate: (container, options) => {
+                        let btnGroup = document.createElement("div");
+                        btnGroup.setAttribute("class", "btn-group btn-group-sm");
+                        btnGroup.setAttribute("role", "group");
+
+                        let btnTemplate = document.createElement("a");
+                        btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+                        if (options.data == null || options.data.trainCSV == null || options.data.trainCSV == false) {
+                            btnTemplate.setAttribute("class", "btn btn-danger");
+                        }
+                        else {
+                            btnTemplate.setAttribute("class", "btn btn-success");
+                            btnTemplate.setAttribute("href", `/plateFiles/${options.data.id}/${options.data.kappaFile}`);
+                            btnTemplate.setAttribute("target", "_blank");
+                        }
+                        btnGroup.append(btnTemplate);
+
+                        container.append(btnGroup);
+                    }
+                }
+            ],
+            masterDetail: {
+                enabled: true,
+                template: function (container, options) {
+                    $('<h2>').text(`#${options.data.id} Plate Items:`).appendTo(container);
+
+                    $('<div>').dxDataGrid({
+                        columnsAutoWidth: true,
+                        showBorders: true,
+                        showRowLines: true,
+                        rowAlternationEnable: true,
+                        paging: {
+                            pageSize: 30,
+                        },
+                        loadPanel: {
+                            enabled: true
+                        },
+                        editing: {
+                            mode: "form",
+                            allowUpdating: false,
+                            allowDeleting: false,
+                            allowAdding: false,
+                            useIcons: true,
+                        },
+                        columns: [
+                            {
+                                dataField: "MGC31944"
+                            },
+                            {
+                                dataField: "CCL19"
+                            },
+                            {
+                                dataField: "DNAJC8"
+                            },
+                            {
+                                dataField: "LGALS1"
+                            },
+                            {
+                                dataField: "MARK1"
+                            },
+                            {
+                                dataField: "PUSL1"
+                            },
+                            {
+                                dataField: "IL20"
+                            },
+                            {
+                                dataField: "KAPPA"
+                            },
+                            {
+                                dataField: "mlPrediction"
+                            },
+                            {
+                                dataField: "mlScore1"
+                            },
+                            {
+                                dataField: "mlScore2"
+                            }
+                        ],
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: ["id"],
+                            errorHandler: function (error) { console.log(error) },
+                            load: function (loadOptions) {
+                                var d = $.Deferred();
+                                Sotec.TableOP(
+                                    { type: 'S', tableName: 'OrderItems', keys: { deleted: 0, plateid: options.data.id } },
+                                    function (ret) {
+                                        d.resolve(ret, { totalCount: ret.length });
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            }
+                        }),
+                    }).appendTo(container);
+                }
+            }
+        }).dxDataGrid('instance');
+    </script>
+}
+
+<div class="row g-5 g-xl-8">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <div id="dgTable"></div>
+            </div>
+        </div>
+    </div>
+</div>

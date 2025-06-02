@@ -1,0 +1,1198 @@
+﻿
+@{
+}
+
+@section Scripts {
+    <script src="https://www.paypal.com/sdk/js?client-id=Ae9oOYHi3BGb_pHLejcbe0U0EDcHb5ATO3y32Ow4LiUwUwOnV1hI1dgmJdRKCjWTJaK9wGuFDIWHaMuy" data-sdk-integration-source="integrationbuilder_sc"></script>
+    <script>
+        
+        var orderID = 0;
+        var price = 0;
+
+        const userType = "@(User.IsInRole("admin") ? "admin" : (User.IsInRole("doctor") ? "doctor" : (User.IsInRole("patient") ? "patient" : (User.IsInRole("labDoctor") ? "labDoctor" : (User.IsInRole("labUser") ? "labUser" : (User.IsInRole("controlUser") ? "controlUser" : ""))))))";
+        
+        var store = new DevExpress.data.CustomStore({
+            key: ["id"],
+            errorHandler: function (error) { console.log(error) },
+            load: function (loadOptions) {
+                var d = $.Deferred();
+
+                var keys = { deleted: 0 };
+                if (userType == "patient") {
+                    keys.patientid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                }
+                else if (userType == "doctor") {
+                    keys.doctorid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                    keys.hospitalid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.Surname).First().Value;
+                }
+                
+                
+
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Orders', keys: keys },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            insert: function (values) {
+                var d = $.Deferred();
+
+                values.doctorid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.hospitalid = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.Surname).First().Value;
+                
+                Sotec.TableOP(
+                    { type: 'I', tableName: 'Orders', values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            update: function (key, values) {
+                var d = $.Deferred();
+
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Orders', values: values, keys: key },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            remove: function (key) {
+                var d = $.Deferred();
+
+                var values = {};
+                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                values.updatedDate = new Date();
+                values.deleted = 1;
+
+                Sotec.TableOP(
+                    { type: 'U', tableName: 'Orders', keys: key, values: values },
+                    function (ret) {
+                        d.resolve();
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storeDoctor = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 1, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storePatient = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2 } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        var storeProduct = new DevExpress.data.CustomStore({
+            key: "id",
+            load: function (loadOptions) {
+                var keys = { deleted: 0 };
+                if (loadOptions.searchValue && loadOptions.searchValue.length > 0) {
+                    keys.sku = loadOptions.searchValue;
+                }
+
+
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Products', keys: keys },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            },
+            byKey: function (key) {
+                var d = $.Deferred();
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Products', keys: { deleted: 0, id: key } },
+                    function (ret) {
+                        d.resolve(ret, { totalCount: ret.length });
+                    },
+                    function (ret) {
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                        d.resolve();
+                    }
+                );
+                return d.promise();
+            }
+        });
+        
+        var dgTable = $('#dgTable').dxDataGrid({
+            dataSource: store,
+            columnsAutoWidth: true,
+            showBorders: true,
+            showColumnLines: false,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            paging: {
+                pageSize: 10,
+            },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto"
+            },
+            toolbar: {
+                items: [
+                    {
+                        location: "after",
+                        widget: "dxButton",
+                        options: {
+                            icon: "add",
+                            text: "Prescribe", // Buraya istediğin metni yaz
+                            onClick: function () {
+                                $("#dgTable").dxDataGrid("instance").addRow();
+                            }
+                        },
+                        visible: @(User.IsInRole("doctor") ? "true" : "false")
+                    }
+                ]
+            },
+            editing: {
+                mode: "popup",
+                allowUpdating: @(User.IsInRole("doctor") ? "true" : "false"),
+                allowDeleting: @(User.IsInRole("admin") ? "true" : "false"),
+                allowAdding: false,@* @(User.IsInRole("doctor") ? "true" : "false"),*@
+                useIcons: true,
+                form: {
+                    items: [{
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 2,
+                        items: [
+                            {
+                                itemType: 'group',
+                                caption: "Info",
+                                colCount: 2,
+                                colSpan: 2,
+                                items: ["patientid", "status"],
+                            },
+                            {
+                                itemType: 'group',
+                                caption: "Descriptions",
+                                colCount: 1,
+                                colSpan: 2,
+                                items: [{
+                                    dataField: 'description1',
+                                    editorType: 'dxTextArea',
+                                    colSpan: 2,
+                                    editorOptions: {
+                                        height: 100,
+                                    },
+                                }, {
+                                    dataField: 'description2',
+                                    editorType: 'dxTextArea',
+                                    colSpan: 2,
+                                    editorOptions: {
+                                        height: 100,
+                                    },
+                                }],
+                            },
+
+
+                        ],
+                    }],
+                }
+            },
+            columns: [
+                {
+                    dataField: "createdDate",
+                    dataType: "datetime",
+                    allowEditing: false,
+                    sortIndex: 0, 
+                    sortOrder: "desc"
+                },
+                {
+                    visible: @(User.IsInRole("doctor") ? "false" : "true"),
+                    dataField: "doctorid",
+                    caption: "Doctor",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storeDoctor,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: getDisplayUser
+                    }
+                }, /*{
+                    visible: @(User.IsInRole("doctor") ? "true" : "false"),
+                    dataField: "patientid",
+                    caption: "Patient",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storePatient,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: getDisplayUser
+                    }
+                },*/
+                {
+                    visible: @(User.IsInRole("doctor") ? "true" : "false"),
+                    dataField: "patientid",
+                    caption: "Patient",
+                    //validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: {
+                            store: storePatient,
+                            paginate: false
+                        },
+                        valueExpr: 'id',
+                        displayExpr: getDisplayUser
+                    },
+                    editCellTemplate: editCellPatientTemplate
+                }, {
+                    dataField: "totalPrice",
+                    allowEditing: false,
+                }
+                , {
+                    dataField: "description1"
+                }, {
+                    dataField: "description2"
+                }, {
+                    dataField: "carrier",
+                    visible: false,
+                }, {
+                    dataField: "shippingNumber",
+                    visible: false
+                }, {
+                    dataField: "status",
+                    validationRules: [{ type: "required" }],
+                    lookup: {
+                        dataSource: [
+                            { status: 0, value: "Draft" },
+                            { status: 1, value: "Preparing"},
+                            { status: 2, value: "Waiting" },
+                            { status: 3, value: "Paid", disabled: true },
+                            { status: 4, value: "Wait For Shipping", disabled: true },
+                            { status: 5, value: "Shipped", disabled: true },
+                            { status: 6, value: "In Transit", disabled: true },
+                            { status: 7, value: "Delivered", disabled: true },
+                            { status: 8, value: "Quality Control", disabled: true },
+                            { status: 9, value: "In Process", disabled: true },
+                            { status: 10, value: "Lab Test Completed", disabled: true },
+                            { status: 11, value: "MLA Start", disabled: true },
+                            { status: 12, value: "MD Control", disabled: true },
+                            { status: 13, value: "Done", disabled: true },
+                            { status: 17, value: "Indeterminate", disabled: true },
+                            { status: 14, value: "Failed", disabled: true },
+                            { status: 15, value: "Cancelled", disabled: true },
+                            { status: 16, value: "Any Problem", disabled: true }
+                        ],
+                        displayExpr: 'value',
+                        valueExpr: 'status'
+                    },
+                    setCellValue(rowData, value, currentRowData) {
+                        if (currentRowData.status < 3 || currentRowData.status == null) {
+                            if (value == 0) {
+                                if (userType == "doctor") {
+                                    rowData.status = value;
+                                }
+                                else {
+                                    DevExpress.ui.notify("You dont have permission", "error", 5000);
+                                }
+                            } else if (value == 1) {
+                                if (userType == "doctor") {
+                                    rowData.status = value;
+                                }
+                                else {
+                                    DevExpress.ui.notify("You dont have permission", "error", 5000);
+                                }
+
+                            } else if (value == 2) {
+                                if (userType == "doctor") {
+                                    rowData.status = value;
+                                }
+                                else {
+                                    DevExpress.ui.notify("You dont have permission", "error", 5000);
+                                }
+
+                            } else {
+                                DevExpress.ui.notify("You dont have permission", "error", 5000);
+                            }
+                        } else {
+                            DevExpress.ui.notify("You dont have permission", "error", 5000);
+                        }
+                        
+                    }
+                }, {
+                    type: "buttons",
+                    buttons: [{
+                        icon: "fa fa-credit-card",
+                        visible: function (e) { return (e.row.data.status == 2 ? true : false); },
+                        onClick: function (e) {
+                            openPaid(e.row.data.id);
+                        }
+                    },
+                    {
+                        icon: "fa fa-print",
+                        visible: function (e) { return (e.row.data.status == 5 ? true : false); },
+                        onClick: function (e) {
+                            window.open(`/FedEx/${e.row.data.id}/${e.row.data.shippingNumber}.png`, '_blank');
+                        }
+                    }, "edit"]
+                },
+                
+            ],
+            masterDetail: {
+
+                enabled: true,
+                template: function (container, options) {
+                    $('<h2>').text(`#${options.data.id} Order Tests:`).appendTo(container);
+
+                    $('<div>').addClass("detail-grid").dxDataGrid({
+                        columnsAutoWidth: true,
+                        showBorders: true,
+                        showRowLines: true,
+                        rowAlternationEnable: true,
+                        paging: {
+                            pageSize: 30,
+                        },
+                        loadPanel: {
+                            enabled: true
+                        },
+                        toolbar: {
+                            items: [
+                                {
+                                    location: "after",
+                                    widget: "dxButton",
+                                    options: {
+                                        icon: "add",
+                                        text: "Prescribe a Test", // Buraya istediğin metni yaz
+                                        onClick: function (e) {
+                                            const detailGrid = $(container).find(".detail-grid").dxDataGrid("instance");
+                                            detailGrid.addRow();
+                                        }
+                                    },
+                                    visible: @(User.IsInRole("doctor") ? Html.Raw("(options.data.status < 3 ? true : false)") : "false")
+                                }
+                            ]
+                        },
+                        editing: {
+                            mode: "form",
+                            allowUpdating: @(User.IsInRole("doctor") ? Html.Raw("(options.data.status < 3 ? true : false)") : "false"),
+                            allowDeleting: @(User.IsInRole("doctor") ? Html.Raw("(options.data.status < 3 ? true : false)") : "false"),
+                            allowAdding: false, @*@(User.IsInRole("doctor") ? Html.Raw("(options.data.status < 3 ? true : false)") : "false"),*@
+                            useIcons: true,
+                            form: {
+                                items: [{
+                                    itemType: 'group',
+                                    colCount: 2,
+                                    colSpan: 2,
+                                    items: [
+                                        "productid",
+                                        "price",
+                                        {
+                                            dataField: 'description',
+                                            editorType: 'dxTextArea',
+                                            colSpan: 2,
+                                            editorOptions: {
+                                                height: 100,
+                                            },
+                                        }
+                                    ],
+                                }],
+                            }
+                        },
+                        columns: [
+                            {
+                                caption: "Lab ID",
+                                allowEditing: false,
+                                formItem: {
+                                    visible: false // Edit formda gözükmez
+                                },
+                                calculateCellValue: function (rowData) {
+                                    return Sotec.toMixedNumber(rowData.id); // Hesaplama
+                                }
+                            },
+                            {
+                                dataField: "productid",
+                                caption: "Product",
+                                validationRules: [{ type: "required" }],
+                                lookup: {
+                                    dataSource: {
+                                        store: storeProduct,
+                                        paginate: false
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: getDisplayProduct
+                                },
+                                setCellValue(rowData, value) {
+                                    return getPrice(value).done(function (data) {
+                                        rowData.productid = value;
+                                        rowData.price = data[0].price;
+                                    });
+                                },
+                            }, 
+                            {
+                                dataField: "price",
+                                allowEditing: false,
+                                validationRules: [{ type: "required" }]
+                            },
+                            {
+                                caption: "Medical Necessity Form",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellMNFFormTemplate
+                            },
+                            {
+                                caption: "Patient Consent",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellLISICFormTemplate
+                            },
+                            {
+                                caption: "Test Requisition Form",
+                                width: 170,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                cellTemplate: cellTRFFormTemplate
+                            },
+                            {
+                                caption: "ML Report",
+                                width: 100,
+                                allowFiltering: false,
+                                allowSorting: false,
+                                //cellTemplate: cellTestRequestFileTemplate,
+                                cellTemplate(cntnr, optns) {
+                                    console.log(options);
+                                    console.log(cntnr);
+
+                                    if (optns.data == null || optns.data.mlPrediction == null || optns.data.mlPrediction == "" || options.data.status != 13) {
+                                        let fileElement = document.createElement("p");
+                                        fileElement.innerHTML = "No Media";
+                                        cntnr.append(fileElement);
+                                    }
+                                    else {
+                                        let fileElement = document.createElement("a");
+                                        fileElement.innerHTML = "Download";
+                                        fileElement.setAttribute("href", "/Order/GetMLReport/" + optns.data.id);
+                                        fileElement.setAttribute("target", "_blank");
+                                        cntnr.append(fileElement);
+                                    }
+                                }
+                            }, 
+                            {
+                                dataField: "description"
+                            }, 
+                            {
+                                type: "buttons",
+                                buttons: ["edit", "delete"]
+                            }
+                        ],
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: ["id"],
+                            errorHandler: function (error) { console.log(error) },
+                            load: function (loadOptions) {
+                                var d = $.Deferred();
+                                Sotec.TableOP(
+                                    { type: 'S', tableName: 'OrderItems', keys: { deleted: 0, orderid: options.data.id } },
+                                    function (ret) {
+                                        d.resolve(ret, { totalCount: ret.length });
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            insert: function (values) {
+                                var d = $.Deferred();
+
+                                values.createdUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.orderid = options.data.id;
+                                values.quantity = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'I', tableName: 'OrderItems', values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            update: function (key, values) {
+                                var d = $.Deferred();
+
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'OrderItems', values: values, keys: key },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            },
+                            remove: function (key) {
+                                var d = $.Deferred();
+
+                                var values = {};
+                                values.updatedUserID = @User.Claims.Where(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).First().Value;
+                                values.updatedDate = new Date();
+                                values.deleted = 1;
+
+                                Sotec.TableOP(
+                                    { type: 'U', tableName: 'OrderItems', keys: key, values: values },
+                                    function (ret) {
+                                        d.resolve();
+                                    },
+                                    function (ret) {
+                                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                        d.resolve();
+                                    }
+                                );
+                                return d.promise();
+                            }
+                        }),
+                    }).appendTo(container);
+                }
+            }
+        }).dxDataGrid('instance');
+        
+        function getPrice(id) {
+            var d = $.Deferred();
+            Sotec.TableOP(
+                { type: 'S', tableName: 'Products', keys: { deleted: 0, id: id } },
+                function (ret) {
+                    d.resolve(ret);
+                },
+                function (ret) {
+                    DevExpress.ui.notify(ret.responseText, "error", 5000);
+                    d.resolve();
+                }
+            );
+            return d.promise();
+        }
+
+        function cellTestRequestFileTemplate(container, options) {
+            if (options.value == null || options.value == "") {
+                let fileElement = document.createElement("p");
+                fileElement.innerHTML = "No Media";
+                container.append(fileElement);
+            }
+            else {
+                let fileElement = document.createElement("a");
+                fileElement.innerHTML = "Download";
+                fileElement.setAttribute("href", "/media/" + options.value);
+                fileElement.setAttribute("target", "_blank");
+                container.append(fileElement);
+            }
+        }
+
+        function editCellTestRequestFileTemplate(cellElement, cellInfo) {
+            let buttonElement = document.createElement("div");
+            buttonElement.classList.add("retryButton");
+            let retryButton = $(buttonElement).dxButton({
+                text: "Retry",
+                visible: false,
+                onClick: function () {
+                    for (var i = 0; i < fileUploader._files.length; i++) {
+                        delete fileUploader._files[i].uploadStarted;
+                    }
+                    fileUploader.upload();
+                }
+            }).dxButton("instance");
+
+            let fileUploaderElement = document.createElement("div");
+            let fileUploader = $(fileUploaderElement).dxFileUploader({
+                multiple: false,
+                accept: ".csv, text/csv",
+                uploadMode: "instantly",
+                uploadUrl: "/Order/UploadTestRequestFile",
+                maxFileSize: 10000000,
+                invalidMaxFileSizeMessage: "File is too large (MAX 10MB)",
+                onValueChanged: function (e) {
+                    let reader = new FileReader();
+                    /*reader.onload = function (args) {
+                        imageElement.setAttribute('src', args.target.result);
+                    }*/
+                    reader.readAsDataURL(e.value[0]); // convert to base64 string
+                },
+                onUploaded: function (e) {
+                    cellInfo.setValue(e.request.responseText);
+                    retryButton.option("visible", false);
+                },
+                onUploadError: function (e) {
+                    let xhttp = e.request;
+                    if (xhttp.status === 400) {
+                        e.message = e.error.responseText;
+                    }
+                    if (xhttp.readyState === 4 && xhttp.status === 0) {
+                        e.message = "Connection refused";
+                    }
+                    retryButton.option("visible", true);
+                }
+            }).dxFileUploader("instance");
+
+            /*let imageElement = document.createElement("img");
+            imageElement.classList.add("uploadedImage");
+            imageElement.setAttribute('src', "/media/" + cellInfo.value);
+
+            cellElement.append(imageElement);*/
+            cellElement.append(fileUploaderElement);
+            cellElement.append(buttonElement);
+        }
+
+        function editCellPatientTemplate(cellElement, cellInfo) {
+            let textElement = document.createElement("div");
+            let infoElement = document.createElement("p");
+
+            let textbox = $(textElement).dxTextBox({
+                placeholder: 'Enter email here...',
+                buttons: [{
+                    name: 'search',
+                    location: 'after',
+                    options: {
+                        text: 'Search',
+                        stylingMode: 'outlined',
+                        type: 'normal',
+                        icon: 'search',
+                        onClick() {
+                            Swal.showLoading();
+                            Sotec.TableOP(
+                                { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2, email: textbox.option('value') } },
+                                function (ret) {
+                                    Swal.close();
+                                    if (ret.length <= 0) {
+                                        infoElement.innerHTML = "There is no patient with this email";
+                                        cellInfo.setValue(null);
+                                    }
+                                    else {
+                                        infoElement.innerHTML = ret[0].firstname + " " + ret[0].lastname;
+                                        cellInfo.setValue(ret[0].id);
+                                    }
+                                },
+                                function (ret) {
+                                    Swal.close();
+                                    cellInfo.setValue(null);
+                                    DevExpress.ui.notify(ret.responseText, "error", 5000);
+                                }
+                            );
+                        },
+                    },
+                }]
+            }).dxValidator({
+                validationRules: [{
+                    type: 'required',
+                    message: 'Email is required',
+                }, {
+                    type: 'email',
+                    message: 'Email is invalid',
+                }],
+            }).dxTextBox("instance");
+
+            if (cellInfo.value && cellInfo.value > 0) {
+                Sotec.TableOP(
+                    { type: 'S', tableName: 'Users', keys: { deleted: 0, type: 2, id: cellInfo.value } },
+                    function (ret) {
+                        Swal.close();
+                        if (ret.length <= 0) {
+                            infoElement.innerHTML = "There is no patient with this email";
+                            cellInfo.setValue(null);
+                        }
+                        else {
+                            infoElement.innerHTML = ret[0].firstname + " " + ret[0].lastname;
+                            cellInfo.setValue(ret[0].id);
+                        }
+                    },
+                    function (ret) {
+                        Swal.close();
+                        cellInfo.setValue(null);
+                        DevExpress.ui.notify(ret.responseText, "error", 5000);
+                    }
+                );
+            }
+
+            cellElement.append(textElement);
+            cellElement.append(infoElement);
+        }
+
+        function getDisplayUser(item) {
+            if (!item) {
+                return '';
+            }
+            return `${item.firstname} ${item.lastname}`;
+        }
+        
+        function getDisplayProduct(item) {
+            if (!item) {
+                return '';
+            }
+            return `${item.name} [${item.sku}]`;
+        }
+
+        function openPaid(_orderID) {
+            Swal.showLoading();
+
+            Sotec.GetData(
+                { url: "/User/Home/GetOrderPrice", data: { orderID: _orderID } },
+                function (ret) {
+                    Swal.close();
+
+                    if (ret <= 0) {
+                        Swal.fire({
+                            text: "There are no items.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonColor: "#00adb5",
+                            confirmButtonText: "OK",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                    else {
+                        renderPaypal(_orderID, ret);
+                        $('#kt_modal_create_app').modal('show');
+                    }
+                },
+                function (ret) {
+                    Swal.close();
+                    Swal.fire({
+                        text: ret.responseText,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonColor: "#00adb5",
+                        confirmButtonText: "Try Again",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            );
+
+		}
+
+        // Example function to show a result to the user. Your site's UI library can be used instead.
+        function resultMessage(message) {
+            const container = document.querySelector("#result-message");
+            container.innerHTML = message;
+            DevExpress.ui.notify(message, "error", 5000);
+        }
+
+
+        function renderPaypal(_orderID, _price) {
+            orderID = _orderID;
+            price = _price;
+            document.getElementById('paypal-button-container').innerHTML = '';
+            window.paypal
+                .Buttons({
+                    style: {
+                        shape: "rect",
+                        layout: "vertical",
+                    },
+                    async createOrder(data, actions) {
+                        try {
+                            return actions.order.create({ purchase_units: [{ amount: { value: price } }] });
+                        } catch (error) {
+                            console.error(error);
+                            resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
+                        }
+                    },
+                    async onApprove(data, actions) {
+                        try {
+                            console.log(data);
+                            return actions.order.capture().then(function (orderData) {
+                                const transaction = orderData.purchase_units[0].payments.captures[0];
+                                Sotec.GetData({ url: "/User/Home/SetOrderPayment", data: { orderID: orderID, transaction: transaction.id } }, function (ret) {
+                                    $('#dgTable').dxDataGrid("instance").refresh();
+                                    $('#kt_modal_create_app').modal('hide');
+                                    DevExpress.ui.notify("Order payment succesfully.", "success", 5000);
+                                });
+                            });
+                        } catch (error) {
+                            console.error(error);
+                            resultMessage(
+                                `Sorry, your transaction could not be processed...<br><br>${error}`,
+                            );
+                        }
+                    },
+                })
+                .render("#paypal-button-container");
+        }
+
+        function cellMNFFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/Order/GetMNFReport/" + options.data.id);
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInput')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.mnf == null || options.data.mnf == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/mnfForms/" + options.data.mnf);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+
+        function cellLISICFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/formTemplates/LISInformedConsent.pdf");
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInputLISIC')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.lisic == null || options.data.lisic == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/lisicForms/" + options.data.lisic);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+        
+        function cellTRFFormTemplate(container, options) {
+            console.log(options);
+
+            let btnGroup = document.createElement("div");
+            btnGroup.setAttribute("class", "btn-group btn-group-sm");
+            btnGroup.setAttribute("role", "group");
+
+            let btnTemplate = document.createElement("a");
+            btnTemplate.innerHTML = "<i class='fa fa-download'></i>";
+            btnTemplate.setAttribute("class", "btn btn-secondary");
+            btnTemplate.setAttribute("href", "/formTemplates/DurinTRFForm.pdf");
+            btnTemplate.setAttribute("target", "_blank");
+            btnGroup.append(btnTemplate);
+
+            let btnUpload = document.createElement("button");
+            btnUpload.innerHTML = "<i class='fa fa-upload'></i>";
+            btnUpload.setAttribute("class", "btn btn-secondary");
+            btnUpload.setAttribute("target", "_blank");
+            btnUpload.onclick = function () {
+                var selectedID = $('#selectedID')[0];
+                selectedID.value = options.data.id;
+                var fileInput = $('#fileInputTRF')[0];
+                fileInput.click();
+            };
+            btnGroup.append(btnUpload);
+
+
+            let btnDownload = document.createElement("a");
+            btnDownload.innerHTML = "<i class='fa fa-file'></i>";
+            if (options.data == null || options.data.trf == null || options.data.trf == "") {
+                btnDownload.setAttribute("class", "btn btn-danger");
+            }
+            else {
+                btnDownload.setAttribute("class", "btn btn-success");
+                btnDownload.setAttribute("href", "/trfForms/" + options.data.trf);
+            }
+            btnDownload.setAttribute("target", "_blank");
+            btnGroup.append(btnDownload);
+
+            container.append(btnGroup);
+        }
+
+        $('#fileInput').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadMNF?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+
+        $('#fileInputLISIC').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadLISIC?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+
+        $('#fileInputTRF').on('change', function () {
+            var selectedID = $('#selectedID')[0];
+            var fileInput = this;
+            var file = fileInput.files[0];
+
+            if (!file) {
+                $('#result').text("No media.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("id", selectedID.value);
+            Swal.showLoading();
+            $.ajax({
+                url: "/Order/UploadTRF?handler=Upload",
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    Swal.close();
+                    DevExpress.ui.notify("File uploaded succesfully.", "success", 5000);
+                    $('#dgTable').dxDataGrid("instance").refresh();
+                },
+                error: function (error) {
+                    Swal.close();
+                    DevExpress.ui.notify(error, "error", 5000);
+                }
+            });
+        });
+        
+	</script>
+}
+
+
+
+<div class="card">
+	<!--begin::Card header-->
+	<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_deactivate" aria-expanded="true" aria-controls="kt_account_deactivate">
+		<div class="card-title m-0">
+			<h3 class="fw-bold m-0">My Orders</h3>
+		</div>
+	</div>
+	<!--end::Card header-->
+	<!--begin::Content-->
+	<div class="collapse show">
+		<!--begin::Card body-->
+		<div class="card-body border-top p-9">
+            <div id="dgTable"></div>
+		</div>
+		<!--end::Card body-->
+	</div>
+	<!--end::Content-->
+</div>
+
+
+
+<!--begin::Modal - Create App-->
+<div class="modal fade" id="kt_modal_create_app" tabindex="-1" aria-hidden="true">
+	<!--begin::Modal dialog-->
+	<div class="modal-dialog modal-dialog-centered mw-800px">
+		<!--begin::Modal content-->
+		<div class="modal-content">
+			<!--begin::Modal header-->
+			<div class="modal-header">
+				<!--begin::Modal title-->
+				<h2>Order Payment</h2>
+				<!--end::Modal title-->
+				<!--begin::Close-->
+				<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+					<i class="ki-duotone ki-cross fs-1">
+						<span class="path1"></span>
+						<span class="path2"></span>
+					</i>
+				</div>
+				<!--end::Close-->
+			</div>
+			<!--end::Modal header-->
+			<!--begin::Modal body-->
+			<div class="modal-body py-lg-10 px-lg-10">
+                <div id="paypal-button-container"></div>
+                <p id="result-message"></p>
+			</div>
+			<!--end::Modal body-->
+		</div>
+		<!--end::Modal content-->
+	</div>
+	<!--end::Modal dialog-->
+</div>
+<!--end::Modal - Create App-->
+
+<input type="file" id="fileInput" style="display:none;" />
+<input type="file" id="fileInputTRF" style="display:none;" />
+<input type="file" id="fileInputLISIC" style="display:none;" />
+<input type="hidden" id="selectedID" />
+

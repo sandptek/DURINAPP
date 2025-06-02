@@ -1,0 +1,323 @@
+﻿@using System.Security.Claims;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>@ViewData["Title"] - DurinLS</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/x-icon" href="/fend/img/favicon.ico">
+	<link rel="icon" type="image/png" sizes="32x32" href="/media/favicon.png">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+
+	<link href="/metronic/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+	<link href="/metronic/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	@*
+	<script type="text/javascript" src="/devextreme/js/jquery.min.js"></script>*@
+	<link rel="stylesheet" href="/devextreme/css/dx.light.css">
+
+	@await RenderSectionAsync("Styles", required: false)
+</head>
+<body id="kt_app_body" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" class="app-default">
+	<script>
+		var defaultThemeMode = "light";
+		var themeMode;
+
+		if (document.documentElement) {
+			if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+				themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+			}
+			else {
+				if (localStorage.getItem("data-bs-theme") !== null) {
+					themeMode = localStorage.getItem("data-bs-theme");
+				}
+				else {
+					themeMode = defaultThemeMode;
+				}
+			}
+			if (themeMode === "system") {
+				themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+			}
+			document.documentElement.setAttribute("data-bs-theme", themeMode);
+		}
+	</script>
+
+	<div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+		<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+			<!--begin::Header-->
+			<div id="kt_app_header" class="app-header">
+				<div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
+					<!--begin::Sidebar mobile toggle-->
+					<div class="d-flex align-items-center d-lg-none ms-n3 me-1 me-md-2" title="Show sidebar menu">
+						<div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle">
+							<span class="svg-icon svg-icon-2 svg-icon-md-1">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M21 7H3C2.4 7 2 6.6 2 6V4C2 3.4 2.4 3 3 3H21C21.6 3 22 3.4 22 4V6C22 6.6 21.6 7 21 7Z" fill="currentColor" />
+									<path opacity="0.3" d="M21 14H3C2.4 14 2 13.6 2 13V11C2 10.4 2.4 10 3 10H21C21.6 10 22 10.4 22 11V13C22 13.6 21.6 14 21 14ZM22 20V18C22 17.4 21.6 17 21 17H3C2.4 17 2 17.4 2 18V20C2 20.6 2.4 21 3 21H21C21.6 21 22 20.6 22 20Z" fill="currentColor" />
+								</svg>
+							</span>
+						</div>
+					</div>
+					<!--end::Sidebar mobile toggle-->
+					<!--begin::Mobile logo-->
+					<div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
+						<a href="/Avukat" class="d-lg-none">
+							<img alt="Logo" src="~/media/logo_trans_white.png" class="h-30px" />
+						</a>
+					</div>
+					<!--end::Mobile logo-->
+					<!--begin::Header wrapper-->
+					<div class="d-flex align-items-stretch flex-end flex-lg-grow-1" id="kt_app_header_wrapper">
+						<!--begin::Navbar-->
+						<div class="app-navbar flex-shrink-0">
+							<!--begin::User menu-->
+							<div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
+								<!--begin::Menu wrapper-->
+								<div class="cursor-pointer symbol symbol-30px symbol-md-40px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+									<span class="svg-icon theme-light-show svg-icon-2">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M6.28548 15.0861C7.34369 13.1814 9.35142 12 11.5304 12H12.4696C14.6486 12 16.6563 13.1814 17.7145 15.0861L19.3493 18.0287C20.0899 19.3618 19.1259 21 17.601 21H6.39903C4.87406 21 3.91012 19.3618 4.65071 18.0287L6.28548 15.0861Z" fill="currentColor" />
+											<rect opacity="0.3" x="8" y="3" width="8" height="8" rx="4" fill="currentColor" />
+										</svg>
+									</span>
+								</div>
+								<!--begin::User account menu-->
+								<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
+									<!--begin::Menu item-->
+									<div class="menu-item px-3">
+										<div class="menu-content d-flex align-items-center px-3">
+											<!--begin::Username-->
+											<div class="d-flex flex-column">
+												<div class="fw-bold d-flex align-items-center fs-5">
+													@User.Identity.Name
+													<span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">@User.Claims.Where(x => x.Type == ClaimTypes.Role).First().Value.ToUpper()</span>
+												</div>
+												<a href="#" class="fw-semibold text-muted text-hover-primary fs-7">@User.Claims.Where(x => x.Type == ClaimTypes.Email).First().Value</a>
+											</div>
+											<!--end::Username-->
+										</div>
+									</div>
+									<!--end::Menu item-->
+									<!--begin::Menu separator-->
+									<div class="separator my-2"></div>
+									<!--end::Menu separator-->
+									<!--begin::Menu item
+									<div class="menu-item px-5">
+										<a href="../../demo1/dist/account/overview.html" class="menu-link px-5">Profilim</a>
+									</div>
+									end::Menu item-->
+									<!--begin::Menu item-->
+									<div class="menu-item px-5">
+										<a href="/Login/SignOut" class="menu-link px-5">Sign Out</a>
+									</div>
+									<!--end::Menu item-->
+								</div>
+								<!--end::User account menu-->
+								<!--end::Menu wrapper-->
+							</div>
+							<!--end::User menu-->
+						</div>
+						<!--end::Navbar-->
+					</div>
+					<!--end::Header wrapper-->
+				</div>
+			</div>
+			<!--end::Header-->
+			<!--begin::Wrapper-->er
+			<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
+				<!--begin::Sidebar-->
+				<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+					<!--begin::Logo-->
+					<div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+						<!--begin::Logo image-->
+						<a href="/">
+							<img alt="Logo" src="~/media/logo_trans_white.png" class="h-75px app-sidebar-logo-default" />
+							<img alt="Logo" src="~/media/logo_trans_white.png" class="h-60px app-sidebar-logo-minimize" />
+						</a>
+						<!--end::Logo image-->
+						<!--begin::Sidebar toggle-->
+						<div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary body-bg h-30px w-30px position-absolute top-50 start-100 translate-middle rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
+							<span class="svg-icon svg-icon-2 rotate-180">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path opacity="0.5" d="M14.2657 11.4343L18.45 7.25C18.8642 6.83579 18.8642 6.16421 18.45 5.75C18.0358 5.33579 17.3642 5.33579 16.95 5.75L11.4071 11.2929C11.0166 11.6834 11.0166 12.3166 11.4071 12.7071L16.95 18.25C17.3642 18.6642 18.0358 18.6642 18.45 18.25C18.8642 17.8358 18.8642 17.1642 18.45 16.75L14.2657 12.5657C13.9533 12.2533 13.9533 11.7467 14.2657 11.4343Z" fill="currentColor" />
+									<path d="M8.2657 11.4343L12.45 7.25C12.8642 6.83579 12.8642 6.16421 12.45 5.75C12.0358 5.33579 11.3642 5.33579 10.95 5.75L5.40712 11.2929C5.01659 11.6834 5.01659 12.3166 5.40712 12.7071L10.95 18.25C11.3642 18.6642 12.0358 18.6642 12.45 18.25C12.8642 17.8358 12.8642 17.1642 12.45 16.75L8.2657 12.5657C7.95328 12.2533 7.95328 11.7467 8.2657 11.4343Z" fill="currentColor" />
+								</svg>
+							</span>
+						</div>
+						<!--end::Sidebar toggle-->
+					</div>
+					<!--end::Logo-->
+					<!--begin::sidebar menu-->
+					<div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+						<!--begin::Menu wrapper-->
+						<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y my-5" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+							<!--begin::Menu-->
+							<div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
+								<div class="menu-item pt-5">
+									<div class="menu-content">
+										<span class="menu-heading fw-bold text-uppercase fs-7">Laboratory</span>
+									</div>
+								</div>
+								@if (User.IsInRole("controlUser") || User.IsInRole("admin"))
+								{
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Index", "Product")">
+											<span class="menu-icon"><i class="bi bi-bullseye"></i></span>
+											<span class="menu-title">Products</span>
+										</a>
+									</div>
+								}
+								<div class="menu-item">
+									<a class="menu-link" href="@Url.Action("Index", "Order")">
+										<span class="menu-icon"><i class="bi bi-file-earmark-text"></i></span>
+										<span class="menu-title">Orders</span>
+									</a>
+								</div>
+								@if (User.IsInRole("controlUser") || User.IsInRole("admin"))
+								{
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Plate", "Order")">
+											<span class="menu-icon"><i class="bi bi-table"></i></span>
+											<span class="menu-title">Plates</span>
+										</a>
+									</div>
+								}
+								<div class="menu-item">
+									<a class="menu-link" href="@Url.Action("Index", "Task")">
+										<span class="menu-icon"><i class="bi bi-list-task"></i></span>
+										<span class="menu-title">Tasks</span>
+									</a>
+								</div>
+								@if (User.IsInRole("controlUser") || User.IsInRole("admin") || User.IsInRole("rnd"))
+								{
+									<div class="menu-item pt-5">
+										<div class="menu-content">
+											<span class="menu-heading fw-bold text-uppercase fs-7">ML</span>
+										</div>
+									</div>
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Index", "AI")">
+											<span class="menu-icon"><i class="bi bi-house"></i></span>
+											<span class="menu-title">Send Request</span>
+										</a>
+									</div>
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("ADNI", "AI")">
+											<span class="menu-icon"><i class="bi bi-send-plus"></i></span>
+											<span class="menu-title">R&D</span>
+										</a>
+									</div>
+								}
+								@if (User.IsInRole("controlUser") || User.IsInRole("admin"))
+								{
+									<div class="menu-item pt-5">
+										<div class="menu-content">
+											<span class="menu-heading fw-bold text-uppercase fs-7">Settings</span>
+										</div>
+									</div>
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Index", "User")">
+											<span class="menu-icon"><i class="bi bi-person"></i></span>
+											<span class="menu-title">Users</span>
+										</a>
+									</div>
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Index", "Hospital")">
+											<span class="menu-icon"><i class="bi bi-h-circle"></i></span>
+											<span class="menu-title">Affiliation</span>
+										</a>
+									</div>
+								}
+								@if (User.IsInRole("admin") || User.IsInRole("rnd"))
+								{
+									<div class="menu-item">
+										<a class="menu-link" href="@Url.Action("Settings", "AI")">
+											<span class="menu-icon"><i class="bi bi-gear"></i></span>
+											<span class="menu-title">AI Settings</span>
+										</a>
+									</div>
+									@if (User.IsInRole("admin"))
+									{
+										<div class="menu-item">
+											<a class="menu-link" href="@Url.Action("Company", "Settings")">
+												<span class="menu-icon"><i class="bi bi-gear"></i></span>
+												<span class="menu-title">Company</span>
+											</a>
+										</div>
+										<div class="menu-item">
+											<a class="menu-link" href="@Url.Action("FedEx", "Settings")">
+												<span class="menu-icon"><i class="bi bi-truck"></i></span>
+												<span class="menu-title">FedEx</span>
+											</a>
+										</div>
+									}
+								}
+							</div>
+							<!--end::Menu-->
+						</div>
+						<!--end::Menu wrapper-->
+					</div>
+					<!--end::sidebar menu-->
+				</div>
+				<!--end::Sidebar-->
+				<!--begin::Main-->
+				<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+					<!--begin::Content wrapper-->
+					<div class="d-flex flex-column flex-column-fluid">
+						<!--begin::Toolbar-->
+						<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+							<div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+								<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3"><h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">@ViewData["Title"]</h1></div>
+							</div>
+						</div>
+						<!--end::Toolbar-->
+						<!--begin::Content-->
+						<div id="kt_app_content" class="app-content flex-column-fluid">
+							<div id="kt_app_content_container" class="app-container container-fluid">
+								@RenderBody()
+							</div>
+						</div>
+						<!--end::Content-->
+					</div>
+					<!--end::Content wrapper-->
+					<!--begin::Footer-->
+					<div id="kt_app_footer" class="app-footer">
+						<div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
+							<div class="text-dark order-2 order-md-1">
+								<span class="text-muted fw-semibold me-1">@DateTime.Now.Year &copy;</span>
+								<a href="#" target="_blank" class="text-gray-800 text-hover-primary">SPTech</a>
+							</div>
+						</div>
+					</div>
+					<!--end::Footer-->
+				</div>
+				<!--end:::Main-->
+			</div>
+			<!--end::Wrapper-->
+		</div>
+	</div>
+
+	<div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+		<!--begin::Svg Icon | path: icons/duotune/arrows/arr066.svg-->
+		<span class="svg-icon">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect opacity="0.5" x="13" y="6" width="13" height="2" rx="1" transform="rotate(90 13 6)" fill="currentColor" />
+				<path d="M12.5657 8.56569L16.75 12.75C17.1642 13.1642 17.8358 13.1642 18.25 12.75C18.6642 12.3358 18.6642 11.6642 18.25 11.25L12.7071 5.70711C12.3166 5.31658 11.6834 5.31658 11.2929 5.70711L5.75 11.25C5.33579 11.6642 5.33579 12.3358 5.75 12.75C6.16421 13.1642 6.83579 13.1642 7.25 12.75L11.4343 8.56569C11.7467 8.25327 12.2533 8.25327 12.5657 8.56569Z" fill="currentColor" />
+			</svg>
+		</span>
+		<!--end::Svg Icon-->
+	</div>
+
+	<script>var hostUrl = "/metronic/assets/";</script>
+	<script type="text/javascript" src="/sotec.js"></script>
+	<script src="/metronic/assets/plugins/global/plugins.bundle.js"></script>
+	<script src="/metronic/assets/js/scripts.bundle.js"></script>
+	<script type="text/javascript" src="/devextreme/js/dx.all.js"></script>
+	<script>
+		DevExpress.localization.locale(navigator.language || navigator.browserLanguage);
+		// ...
+		// DevExtreme widgets are configured here
+		// ...
+	</script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

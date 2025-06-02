@@ -1,0 +1,328 @@
+﻿@{
+}
+@section Scripts {
+	<script>
+		"use strict";
+
+		// Class definition
+		var KTSigninGeneral = function () {
+			// Elements
+			var form;
+			var submitButton;
+			var validator;
+
+			// Handle form
+			var handleValidation = function (e) {
+				validator = FormValidation.formValidation(
+					form,
+					{
+						fields: {
+							'email': {
+								validators: {
+									regexp: {
+										regexp: /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/,
+										message: 'EMail is wrong',
+									},
+									notEmpty: {
+										message: 'Please insert email'
+									}
+								}
+							},
+							'firstname': {
+								validators: {
+									notEmpty: {
+										message: 'Please insert first name'
+									}
+								}
+							},
+							'lastname': {
+								validators: {
+									notEmpty: {
+										message: 'Please insert last name'
+									}
+								}
+							},
+							'dateOfBirth': {
+								validators: {
+									notEmpty: {
+										message: 'Please insert date of birth'
+									}
+								}
+							},
+							'phone': {
+								validators: {
+									notEmpty: {
+										message: 'Please insert phone'
+									}
+								}
+							},
+							'gender': {
+								validators: {
+									notEmpty: {
+										message: 'Please select gender'
+									}
+								}
+							}
+							
+						},
+						plugins: {
+							trigger: new FormValidation.plugins.Trigger(),
+							bootstrap: new FormValidation.plugins.Bootstrap5({
+								rowSelector: '.fv-row',
+								eleInvalidClass: '',  // comment to enable invalid state icons
+								eleValidClass: '' // comment to enable valid state icons
+							})
+						}
+					}
+				);
+			}
+
+			var handleSubmitAjax = function (e) {
+				submitButton.addEventListener('click', function (e) {
+					e.preventDefault();
+
+					validator.validate().then(function (status) {
+						if (status == 'Valid') {
+							Swal.showLoading();
+
+							Sotec.GetData(
+								{ url: "/User/Home/CreatePatient", data: {
+									firstname: form.querySelector('[name="firstname"]').value, 
+									lastname: form.querySelector('[name="lastname"]').value,
+									email: form.querySelector('[name="email"]').value,
+									dateOfBirth: form.querySelector('[name="dateOfBirth"]').value,
+									mrnNumber: form.querySelector('[name="mrn"]').value,
+									phone: form.querySelector('[name="phone"]').value,
+									gender: form.querySelector('[name="gender"]').value
+								} },
+								function (ret) {
+									Swal.hideLoading();
+									Swal.fire({
+										text: "Patient created and information email sent.",
+										icon: "success",
+										buttonsStyling: false,
+										confirmButtonColor: "#00adb5",
+										confirmButtonText: "Ok",
+										customClass: {
+											confirmButton: "btn btn-primary"
+										}
+									});
+
+									Swal.fire({
+									  title: "Patient created",
+									  text: "Patient created and information email sent. Do you want create a test?",
+									  icon: "question",
+									  showCancelButton: true,
+									  confirmButtonText: "Yes",
+									  cancelButtonText: "No",
+									  customClass: {
+										confirmButton: "btn btn-success",
+										cancelButton: "btn btn-secondary"
+									  },
+									  buttonsStyling: false
+									}).then((result) => {
+									  if (result.isConfirmed) {
+										window.location.href = "/User/Home/Order";
+									  } else {
+										window.location.href = "/User/Home/Index";
+									  }
+									});
+
+									form.reset();
+								},
+								function (ret) {
+									Swal.hideLoading();
+									Swal.fire({
+										text: ret.responseText,
+										icon: "error",
+										buttonsStyling: false,
+										confirmButtonColor: "#00adb5",
+										confirmButtonText: "Try Again",
+										customClass: {
+											confirmButton: "btn btn-primary"
+										}
+									});
+								}
+							);
+						} else {
+							Swal.hideLoading();
+							Swal.fire({
+								text: "Warning, plese fill all required inputs.",
+								icon: "error",
+								buttonsStyling: false,
+								confirmButtonColor: "#00adb5",
+								confirmButtonText: "Ok",
+								customClass: {
+									confirmButton: "btn btn-primary"
+								}
+							});
+						}
+					});
+				});
+			}
+
+			// Public functions
+			return {
+				// Initialization
+				init: function () {
+					form = document.querySelector('#formNewPatient');
+					submitButton = document.querySelector('#btnSaveNewPatient');
+
+					handleValidation();
+					handleSubmitAjax();
+				}
+			};
+		}();
+
+		// On document ready
+		KTUtil.onDOMContentLoaded(function () {
+			KTSigninGeneral.init();
+		});
+		
+	</script>
+}
+<!--begin::Basic info-->
+<div class="card mb-5 mb-xl-10">
+	<!--begin::Card header-->
+	<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+		<!--begin::Card title-->
+		<div class="card-title m-0">
+			<h3 class="fw-bold m-0">Create New Patient</h3>
+		</div>
+		<!--end::Card title-->
+	</div>
+	<!--begin::Card header-->
+	<!--begin::Content-->
+	<div id="kt_account_settings_profile_details" class="collapse show">
+		<!--begin::Form-->
+		<form method="POST" action="/User/Home/UpdateSettings" id="formNewPatient" class="form">
+			<!--begin::Card body-->
+			<div class="card-body border-top p-9">
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">Full Name</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8">
+						<!--begin::Row-->
+						<div class="row">
+							<!--begin::Col-->
+							<div class="col-lg-6 fv-row">
+								<input type="text" name="firstname" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" placeholder="First name" required />
+							</div>
+							<!--end::Col-->
+							<!--begin::Col-->
+							<div class="col-lg-6 fv-row">
+								<input type="text" name="lastname" class="form-control form-control-lg form-control-solid" placeholder="Last name" required />
+							</div>
+							<!--end::Col-->
+						</div>
+						<!--end::Row-->
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">EMail</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="email" name="email" class="form-control form-control-lg form-control-solid" placeholder="EMail" required/>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">Date of Birth</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="date" name="dateOfBirth" class="form-control form-control-lg form-control-solid" placeholder="Date of Birth" required/>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">Gender</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<select name="gender" aria-label="Select a Gender" data-control="select2" data-placeholder="Select a gender.." class="form-select form-select-solid form-select-lg">
+							<option value="">Select a gender..</option>
+							<option value="M">
+								Male
+							</option>
+							<option value="F">
+								Female
+							</option>
+							<option value="NB">
+								Non-Binary
+							</option>
+							<option value="TM">
+								Transgender Man
+							</option>
+							<option value="TW">
+								Transgender Woman
+							</option>
+							<option value="-">
+								Prefer Not to Disclose
+							</option>
+						</select>
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label fw-semibold fs-6">MRN Number</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="text" name="mrn" class="form-control form-control-lg form-control-solid" placeholder="MRN Number" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+				<!--begin::Input group-->
+				<div class="row mb-6">
+					<!--begin::Label-->
+					<label class="col-lg-4 col-form-label required fw-semibold fs-6">
+						<span class="">Contact Phone</span>
+						<span class="ms-1" data-bs-toggle="tooltip" title="Phone number must be active">
+							<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+								<span class="path1"></span>
+								<span class="path2"></span>
+								<span class="path3"></span>
+							</i>
+						</span>
+					</label>
+					<!--end::Label-->
+					<!--begin::Col-->
+					<div class="col-lg-8 fv-row">
+						<input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder="Phone number" />
+					</div>
+					<!--end::Col-->
+				</div>
+				<!--end::Input group-->
+			</div>
+			<!--end::Card body-->
+			<!--begin::Actions-->
+			<div class="card-footer d-flex justify-content-end py-6 px-9">
+				<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>
+				<button type="submit" class="btn btn-primary" id="btnSaveNewPatient">Create Patient</button>
+			</div>
+			<!--end::Actions-->
+		</form>
+		<!--end::Form-->
+	</div>
+	<!--end::Content-->
+</div>
+<!--end::Basic info-->

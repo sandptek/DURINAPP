@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Settings";
+}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <h3>AD Settings</h3>
+                <form class="form" action="/Settings/SetMCI" method="POST" autocomplete="off">
+                    <input type="hidden" name="TYPE" value="MCI" />
+                    <input type="hidden" name="TRAIN_DATA" value="data/MCI_train_data.csv" />
+                    <input type="hidden" name="TEST_DATA" value="data/MCI_train_data.csv" />
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">IS_TRAIN</label>
+                            <select class="form-control" name="IS_TRAIN">
+                                <option value="True" selected>True</option>
+                                <option value="False">False</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">FORMAT</label>
+                            <input class="form-control" placeholder="FORMAT" name="FORMAT" type="text" value="csv">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">THRESHOLD</label>
+                            <input class="form-control" placeholder="THRESHOLD" name="THRESHOLD" type="number" value="0.5" step="0.1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">NTREE</label>
+                            <input class="form-control" placeholder="NTREE" name="NTREE" type="number" value="1000" step="1">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">MTRY</label>
+                            <input class="form-control" placeholder="MTRY" name="MTRY" type="number" value="3" step="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">KFOLD</label>
+                            <input class="form-control" placeholder="KFOLD" name="KFOLD" type="number" value="5" step="1">
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @* <div class="col-md-6 offset-md-3">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-body pt-5">
+                <h3>PD Settings</h3>
+                <form class="form" action="/Settings/SetMCI" method="POST" autocomplete="off">
+                    <input type="hidden" name="TYPE" value="PD" />
+                    <input type="hidden" name="TRAIN_DATA" value="data/PD Training Set.csv" />
+                    <input type="hidden" name="TEST_DATA" value="data/PD Training Set.csv" />
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">IS_TRAIN</label>
+                            <select class="form-control" name="IS_TRAIN">
+                                <option value="True" selected>True</option>
+                                <option value="False">False</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">FORMAT</label>
+                            <input class="form-control" placeholder="FORMAT" name="FORMAT" type="text" value="csv">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">THRESHOLD</label>
+                            <input class="form-control" placeholder="THRESHOLD" name="THRESHOLD" type="number" value="0.5" step="0.1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">NTREE</label>
+                            <input class="form-control" placeholder="NTREE" name="NTREE" type="number" value="1000" step="1">
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <label for="" class="form-label">MTRY</label>
+                            <input class="form-control" placeholder="MTRY" name="MTRY" type="number" value="3" step="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="" class="form-label">KFOLD</label>
+                            <input class="form-control" placeholder="KFOLD" name="KFOLD" type="number" value="5" step="1">
+                        </div>
+                    </div>
+                    <div class="row text-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> *@
+</div>

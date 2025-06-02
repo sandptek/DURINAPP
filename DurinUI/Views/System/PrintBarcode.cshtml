@@ -1,0 +1,32 @@
+﻿@{
+    Layout = null;
+}
+<html>
+<head>
+    <style>
+        @@media print {
+            @@page {
+                text-align: center;
+                size: 8.5cm 1.5cm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="demo" style="width: 100%;"></div>
+    <script src="~/lib/jquery/jquery-3.6.0.min.js"></script>
+    <script src="~/lib/jquery-barcode/jquery/jquery-barcode.js"></script>
+
+    <script>
+        $("#demo").barcode(
+            "@ViewBag.barcode", // Value barcode (dependent on the type of barcode)
+            "code128", // type (string)
+            {
+                barWidth: 5,
+                barHeight: 150,
+                fontSize: 25
+            }
+        );
+    </script>
+</body>
+</html>
